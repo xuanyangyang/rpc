@@ -20,7 +20,7 @@ public interface Protocol {
      * @param buffer 缓冲
      * @return 解码结果
      */
-    Object decode(ByteBuf buffer);
+    Object decode(ByteBuf buffer) throws Exception;
 
     /**
      * 编码
@@ -28,7 +28,7 @@ public interface Protocol {
      * @param buffer  缓冲
      * @param message 消息
      */
-    void encode(ByteBuf buffer, Object message);
+    void encode(ByteBuf buffer, Object message) throws Exception;
 
     /**
      * 解码结果

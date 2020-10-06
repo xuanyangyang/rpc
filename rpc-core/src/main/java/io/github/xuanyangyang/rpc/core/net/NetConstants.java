@@ -11,4 +11,8 @@ public interface NetConstants {
      * ID长度
      */
     int ID_LENGTH = 2;
+    /**
+     * 默认协议ID
+     */
+    Short DEFAULT_PROTOCOL_ID = 0;
 }

@@ -11,12 +11,14 @@
 
     <modules>
         <module>rpc-core</module>
+        <module>rpc-demo</module>
     </modules>
 
     <properties>
         <java.version>11</java.version>
         <netty.version>4.1.51.Final</netty.version>
         <rpc.version>1.0-SNAPSHOT</rpc.version>
+        <protostuff.version>1.7.2</protostuff.version>
     </properties>
 
     <dependencyManagement>
@@ -34,6 +36,11 @@
                 <version>${rpc.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.github.xuanyangyang</groupId>
+                <artifactId>rpc-demo</artifactId>
+                <version>${rpc.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
@@ -42,6 +49,16 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-core</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-runtime</artifactId>
+                <version>${protostuff.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

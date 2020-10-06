@@ -2,36 +2,37 @@ package io.github.xuanyangyang.rpc.core.net;
 
 import io.github.xuanyangyang.rpc.core.common.RpcException;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
-import io.netty.bootstrap.ServerBootstrap;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * netty 服务端
+ * netty客户端
  *
  * @author xuanyangyang
- * @since 2020/10/4 17:00
+ * @since 2020/10/6 15:09
  */
-public class NettyServer {
+public class NettyClient {
     private final ProtocolManager protocolManager;
 
-    private final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+    private final Logger logger = LoggerFactory.getLogger(NettyClient.class);
 
-    public NettyServer(ProtocolManager protocolManager) {
+    private Channel channel;
+
+    public NettyClient(ProtocolManager protocolManager) {
         this.protocolManager = protocolManager;
     }
 
-    public void bind(int port) {
-        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        NioEventLoopGroup workGroup = new NioEventLoopGroup();
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(bossGroup, workGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<>() {
+    public void connect(String ip, int port) {
+        NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.group(eventLoopGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
                         ch.pipeline()
@@ -41,11 +42,15 @@ public class NettyServer {
                     }
                 });
         try {
-            serverBootstrap.bind(port).sync();
+            channel = bootstrap.connect(ip, port).sync().channel();
         } catch (InterruptedException e) {
-            logger.warn("等待绑定端口被打断");
+            logger.warn("等待连接{}:{}被打断", ip, port);
             throw new RpcException(e);
         }
-        logger.info("服务启动成功，端口：{}", port);
+        logger.info("连接{}:{}成功", ip, port);
+    }
+
+    public void send(Object message) {
+        channel.writeAndFlush(message);
     }
 }

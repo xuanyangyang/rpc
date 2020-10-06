@@ -3,7 +3,7 @@ package io.github.xuanyangyang.rpc.core.net;
 import io.github.xuanyangyang.rpc.core.protocol.NoSuchProtocolException;
 import io.github.xuanyangyang.rpc.core.protocol.Protocol;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
-import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
+import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessageWrapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -14,7 +14,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @author xuanyangyang
  * @since 2020/10/4 17:15
  */
-public class ProtocolEncoder extends MessageToByteEncoder<ProtocolMessage> {
+public class ProtocolEncoder extends MessageToByteEncoder<ProtocolMessageWrapper> {
     private final ProtocolManager protocolManager;
 
     public ProtocolEncoder(ProtocolManager protocolManager) {
@@ -22,11 +22,12 @@ public class ProtocolEncoder extends MessageToByteEncoder<ProtocolMessage> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ProtocolMessage msg, ByteBuf out) throws Exception {
-        Protocol protocol = protocolManager.getProtocol(msg.getProtocolId());
+    protected void encode(ChannelHandlerContext ctx, ProtocolMessageWrapper protocolMessageWrapper, ByteBuf out) throws Exception {
+        Protocol protocol = protocolManager.getProtocol(protocolMessageWrapper.getProtocolId());
         if (protocol == null) {
-            throw new NoSuchProtocolException(msg.getProtocolId());
+            throw new NoSuchProtocolException(protocolMessageWrapper.getProtocolId());
         }
-        protocol.encode(out, msg);
+        out.writeShort(protocolMessageWrapper.getProtocolId());
+        protocol.encode(out, protocolMessageWrapper.getMessage());
     }
 }

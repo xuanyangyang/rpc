@@ -5,6 +5,7 @@ import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.NoSuchCodecException;
 import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.net.NetConstants;
 import io.github.xuanyangyang.rpc.core.protocol.Protocol;
 import io.netty.buffer.ByteBuf;
 
@@ -60,11 +61,11 @@ public class DefaultProtocol implements Protocol {
 
     @Override
     public Short getId() {
-        return 0;
+        return NetConstants.DEFAULT_PROTOCOL_ID;
     }
 
     @Override
-    public Object decode(ByteBuf buffer) {
+    public Object decode(ByteBuf buffer) throws Exception {
         if (buffer.readableBytes() < MAGIC_LENGTH) {
             return DecodeResult.NEED_MORE_INPUT;
         }
@@ -83,12 +84,12 @@ public class DefaultProtocol implements Protocol {
         }
         // 只传递当前需要的buffer
         ByteBuf curByteBuf = buffer.readSlice(length);
-        short headerLength = buffer.readShort();
+        short headerLength = curByteBuf.readShort();
         Header header = decodeHeader(curByteBuf.readSlice(headerLength));
         return decodeBody(curByteBuf, header);
     }
 
-    private Object decodeBody(ByteBuf buffer, Header header) {
+    private Object decodeBody(ByteBuf buffer, Header header) throws Exception {
         byte type = header.getType();
         Object msg;
         if (TYPE_REQUEST == type) {
@@ -99,7 +100,7 @@ public class DefaultProtocol implements Protocol {
         return msg;
     }
 
-    private Response decodeResponse(ByteBuf buffer, Header header) {
+    private Response decodeResponse(ByteBuf buffer, Header header) throws Exception {
         Response response = new Response(header.getMsgId());
         response.setState(buffer.readByte());
         Codec codec = codecManager.getCodec(header.getCodecId());
@@ -108,7 +109,7 @@ public class DefaultProtocol implements Protocol {
         return response;
     }
 
-    private Request decodeRequest(ByteBuf buffer, Header header) {
+    private Request decodeRequest(ByteBuf buffer, Header header) throws Exception {
         Request request = new Request(header.getMsgId());
         RpcInvocationInfo invocationInfo = (RpcInvocationInfo) decodeObj(buffer, header.getCodecId());
         request.setInvocationInfo(invocationInfo);
@@ -122,7 +123,7 @@ public class DefaultProtocol implements Protocol {
         buffer.writeShort(codecId);
         buffer.writeByte(type);
         buffer.writeLong(id);
-        int headerLength = buffer.writerIndex() - headerWriterIndex + 1 + HEADER_LENGTH;
+        int headerLength = buffer.writerIndex() - headerWriterIndex - HEADER_LENGTH;
         buffer.setShort(headerWriterIndex, headerLength);
     }
 
@@ -150,7 +151,7 @@ public class DefaultProtocol implements Protocol {
     }
 
     @Override
-    public void encode(ByteBuf buffer, Object message) {
+    public void encode(ByteBuf buffer, Object message) throws Exception {
         buffer.writeBytes(MAGIC);
         int bodyWriterIndex = buffer.writerIndex();
         buffer.writerIndex(bodyWriterIndex + BODY_LENGTH);
@@ -165,20 +166,20 @@ public class DefaultProtocol implements Protocol {
         } else {
             throw new RpcException("目前不支持除了Request，Response之外的消息类型，收到的消息类型：" + message.getClass());
         }
-        int length = buffer.writerIndex() - bodyWriterIndex + 1 + BODY_LENGTH;
+        int length = buffer.writerIndex() - bodyWriterIndex - BODY_LENGTH;
         buffer.setInt(bodyWriterIndex, length);
     }
 
-    private void encodeResponse(ByteBuf buffer, Response response) {
+    private void encodeResponse(ByteBuf buffer, Response response) throws Exception {
         buffer.writeByte(response.getState());
-        encodeObj(buffer, response);
+        encodeObj(buffer, response.getData());
     }
 
-    public void encodeRequest(ByteBuf buffer, Request request) {
-        encodeObj(buffer, request);
+    public void encodeRequest(ByteBuf buffer, Request request) throws Exception {
+        encodeObj(buffer, request.getInvocationInfo());
     }
 
-    private void encodeObj(ByteBuf buffer, Object obj) {
+    private void encodeObj(ByteBuf buffer, Object obj) throws Exception {
         Codec codec = codecManager.getCodec(codecId);
         if (codec == null) {
             throw new NoSuchCodecException(codecId);
@@ -186,7 +187,7 @@ public class DefaultProtocol implements Protocol {
         codec.encode(buffer, obj);
     }
 
-    private Object decodeObj(ByteBuf buffer, Short codecId) {
+    private Object decodeObj(ByteBuf buffer, Short codecId) throws Exception {
         Codec codec = codecManager.getCodec(codecId);
         if (codec == null) {
             throw new NoSuchCodecException(codecId);

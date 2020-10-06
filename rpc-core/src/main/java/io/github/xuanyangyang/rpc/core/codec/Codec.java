@@ -9,9 +9,24 @@ import io.netty.buffer.ByteBuf;
  * @since 2020/10/4 18:15
  */
 public interface Codec {
+    /**
+     * @return ID
+     */
     Short getId();
 
-    Object decode(ByteBuf byteBuf);
+    /**
+     * 反序列化成对象
+     *
+     * @param byteBuf byteBuf
+     * @return 对象
+     */
+    Object decode(ByteBuf byteBuf) throws Exception;
 
-    void encode(ByteBuf byteBuf, Object msg);
+    /**
+     * 序列化到byteBuf
+     *
+     * @param byteBuf byteBuf
+     * @param obj     对象
+     */
+    void encode(ByteBuf byteBuf, Object obj) throws Exception;
 }
