@@ -30,4 +30,9 @@ public class DefaultProtocolManager implements ProtocolManager {
     public Protocol removeProtocol(Short id) {
         return protocolMap.remove(id);
     }
+
+    @Override
+    public boolean hasProtocol(Short id) {
+        return protocolMap.containsKey(id);
+    }
 }

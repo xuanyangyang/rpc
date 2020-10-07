@@ -26,8 +26,14 @@ public interface ProtocolManager {
     /**
      * 删除协议
      *
-     * @param id 协议
+     * @param id 协议ID
      * @return 被删除的协议
      */
     Protocol removeProtocol(Short id);
+
+    /**
+     * @param id 协议ID
+     * @return 是否有ID对应的协议
+     */
+    boolean hasProtocol(Short id);
 }

@@ -16,13 +16,21 @@ public class Response {
      */
     private byte state;
     /**
+     * 数据
+     */
+    private Object data;
+    /**
+     * 错误信息
+     */
+    private String errMsg;
+    /**
      * ok状态
      */
     public static final byte STATE_OK = 0;
     /**
-     * 数据
+     * 客户端错误
      */
-    private Object data;
+    public static final byte STATE_CLIENT_ERROR = 1;
 
     public Response(Long id) {
         this.id = id;
@@ -46,5 +54,13 @@ public class Response {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
     }
 }

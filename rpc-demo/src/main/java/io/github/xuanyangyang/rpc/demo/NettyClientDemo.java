@@ -21,9 +21,8 @@ public class NettyClientDemo {
         codecManager.addCodec(new ProtostuffCodec(CodecConstants.DEFAULT_CODEC_ID));
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
-        NettyClient nettyClient = new NettyClient(protocolManager);
-        nettyClient.connect("localhost", 10000);
-
+        NettyClient nettyClient = new NettyClient("localhost", 10000, protocolManager);
+        nettyClient.connect();
         Request request = new Request();
         RpcInvocationInfo invocationInfo = new RpcInvocationInfo();
         invocationInfo.setMethodName("hello");
@@ -32,5 +31,7 @@ public class NettyClientDemo {
         invocationInfo.setArgs(new Object[]{1, 2, 3});
         request.setInvocationInfo(invocationInfo);
         nettyClient.send(DefaultProtocolMessageWrapper.createProtocolMessage(NetConstants.DEFAULT_PROTOCOL_ID, request));
+
+
     }
 }

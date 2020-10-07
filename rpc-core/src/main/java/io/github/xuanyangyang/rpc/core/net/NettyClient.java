@@ -10,24 +10,94 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * netty客户端
  *
  * @author xuanyangyang
  * @since 2020/10/6 15:09
  */
-public class NettyClient {
+public class NettyClient implements Client {
     private final ProtocolManager protocolManager;
 
     private final Logger logger = LoggerFactory.getLogger(NettyClient.class);
 
     private Channel channel;
 
-    public NettyClient(ProtocolManager protocolManager) {
+    private final Map<String, Object> attributeMap = new ConcurrentHashMap<>();
+    private final String ip;
+    private final int port;
+
+    public NettyClient(String ip, int port, ProtocolManager protocolManager) {
+        this.ip = ip;
+        this.port = port;
         this.protocolManager = protocolManager;
     }
 
-    public void connect(String ip, int port) {
+
+    public void send(Object message) {
+        if (!isConnected()) {
+            connect();
+        }
+        channel.writeAndFlush(message);
+    }
+
+    @Override
+    public void close() {
+        channel.close();
+    }
+
+    @Override
+    public String getIp() {
+        return ip;
+    }
+
+    @Override
+    public int getPort() {
+        return port;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return channel.isActive();
+    }
+
+    @Override
+    public boolean hasAttribute(String key) {
+        return attributeMap.containsKey(key);
+    }
+
+    @Override
+    public Object getAttribute(String key) {
+        return attributeMap.get(key);
+    }
+
+    @Override
+    public void setAttribute(String key, Object value) {
+        attributeMap.put(key, value);
+    }
+
+    @Override
+    public void removeAttribute(String key) {
+        attributeMap.remove(key);
+    }
+
+    @Override
+    public synchronized void disconnect() {
+        channel.close();
+    }
+
+    @Override
+    public synchronized void connect() {
+        if (isConnected()) {
+            return;
+        }
+        connect(ip, port);
+    }
+
+    private synchronized void connect(String ip, int port) {
         NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(eventLoopGroup)
@@ -50,7 +120,11 @@ public class NettyClient {
         logger.info("连接{}:{}成功", ip, port);
     }
 
-    public void send(Object message) {
-        channel.writeAndFlush(message);
+    @Override
+    public synchronized void reconnect() {
+        if (isConnected()) {
+            disconnect();
+        }
+        connect();
     }
 }
