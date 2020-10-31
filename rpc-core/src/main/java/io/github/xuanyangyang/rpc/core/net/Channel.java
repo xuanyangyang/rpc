@@ -1,5 +1,9 @@
 package io.github.xuanyangyang.rpc.core.net;
 
+import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
+
+import java.util.concurrent.CompletableFuture;
+
 /**
  * 通讯通道
  *
@@ -8,11 +12,11 @@ package io.github.xuanyangyang.rpc.core.net;
  */
 public interface Channel {
     /**
-     * 发送消息
+     * 发送请求
      *
-     * @param message 消息
+     * @param message 请求
      */
-    void send(Object message);
+    <T> CompletableFuture<T> send(ProtocolMessage message);
 
     /**
      * 关闭

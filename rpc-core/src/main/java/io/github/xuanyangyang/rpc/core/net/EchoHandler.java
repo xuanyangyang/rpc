@@ -1,6 +1,5 @@
 package io.github.xuanyangyang.rpc.core.net;
 
-import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocolMessageWrapper;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.Response;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,8 +28,9 @@ public class EchoHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof Request) {
             Request request = (Request) msg;
             Response response = new Response(request.getId());
+            response.setProtocolId(request.getProtocolId());
             response.setData("ok");
-            ctx.writeAndFlush(DefaultProtocolMessageWrapper.createProtocolMessage(NetConstants.DEFAULT_PROTOCOL_ID, response));
+            ctx.writeAndFlush(response);
         }
     }
 }

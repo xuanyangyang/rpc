@@ -1,7 +1,9 @@
 package io.github.xuanyangyang.rpc.core.net;
 
 import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.future.DefaultFuture;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
+import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,8 +39,18 @@ public class NettyClient implements Client {
         this.protocolManager = protocolManager;
     }
 
-
     public void send(Object message) {
+        send0(message);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> send(ProtocolMessage message) {
+        DefaultFuture<T> future = DefaultFuture.newFuture(message.getId());
+        send0(message);
+        return future;
+    }
+
+    protected void send0(Object message) {
         if (!isConnected()) {
             connect();
         }
@@ -61,7 +74,7 @@ public class NettyClient implements Client {
 
     @Override
     public boolean isConnected() {
-        return channel.isActive();
+        return channel != null && channel.isActive();
     }
 
     @Override

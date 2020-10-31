@@ -157,10 +157,12 @@ public class DefaultProtocol implements Protocol {
         buffer.writerIndex(bodyWriterIndex + BODY_LENGTH);
         if (message instanceof Request) {
             Request request = (Request) message;
+            request.setProtocolId(getId());
             encodeHeader(buffer, request.getId(), TYPE_REQUEST);
             encodeRequest(buffer, request);
         } else if (message instanceof Response) {
             Response response = (Response) message;
+            response.setProtocolId(getId());
             encodeHeader(buffer, response.getId(), TYPE_RESPONSE);
             encodeResponse(buffer, response);
         } else {

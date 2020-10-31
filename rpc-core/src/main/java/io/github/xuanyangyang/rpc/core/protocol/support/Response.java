@@ -1,16 +1,18 @@
 package io.github.xuanyangyang.rpc.core.protocol.support;
 
+import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
+
 /**
  * 响应
  *
  * @author xuanyangyang
  * @since 2020/10/5 16:13
  */
-public class Response {
+public class Response implements ProtocolMessage {
     /**
      * id
      */
-    private final Long id;
+    private final long id;
     /**
      * 状态
      */
@@ -24,6 +26,10 @@ public class Response {
      */
     private String errMsg;
     /**
+     * 协议ID
+     */
+    private short protocolId;
+    /**
      * ok状态
      */
     public static final byte STATE_OK = 0;
@@ -36,6 +42,7 @@ public class Response {
         this.id = id;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -62,5 +69,14 @@ public class Response {
 
     public void setErrMsg(String errMsg) {
         this.errMsg = errMsg;
+    }
+
+    @Override
+    public Short getProtocolId() {
+        return protocolId;
+    }
+
+    public void setProtocolId(short protocolId) {
+        this.protocolId = protocolId;
     }
 }

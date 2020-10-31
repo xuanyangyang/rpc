@@ -1,13 +1,15 @@
 package io.github.xuanyangyang.rpc.core.proxy;
 
-import io.github.xuanyangyang.rpc.core.future.DefaultFuture;
-import io.github.xuanyangyang.rpc.core.net.Client;
-import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocolMessageWrapper;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.RpcInvocationInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInstance;
+import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
@@ -19,9 +21,11 @@ import java.util.concurrent.Future;
  */
 public class RpcProxyHandler implements InvocationHandler {
     private final ProxyInfo proxyInfo;
+    private final ServiceInstanceManager serviceInstanceManager;
 
-    public RpcProxyHandler(ProxyInfo proxyInfo) {
+    public RpcProxyHandler(ProxyInfo proxyInfo, ServiceInstanceManager serviceInstanceManager) {
         this.proxyInfo = proxyInfo;
+        this.serviceInstanceManager = serviceInstanceManager;
     }
 
     @Override
@@ -37,6 +41,7 @@ public class RpcProxyHandler implements InvocationHandler {
         }
 
         Request request = new Request();
+        request.setProtocolId(proxyInfo.getProtocolId());
 
         RpcInvocationInfo invocationInfo = new RpcInvocationInfo();
         invocationInfo.setMethodName(methodName);
@@ -46,15 +51,33 @@ public class RpcProxyHandler implements InvocationHandler {
 
         request.setInvocationInfo(invocationInfo);
 
-        DefaultProtocolMessageWrapper protocolMessage = DefaultProtocolMessageWrapper.createProtocolMessage(proxyInfo.getProtocolId(), request);
-
-        DefaultFuture<Object> future = DefaultFuture.newFuture(request.getId());
-        Client client = null;
-        client.send(protocolMessage);
+        List<ServiceInstance> instances = serviceInstanceManager.getInstances(proxyInfo.getName());
+        ServiceInstance instance = selectInstance(instances);
+        CompletableFuture<Object> future = instance.getClient().send(request);
         Class<?> returnType = method.getReturnType();
         if (returnType.isAssignableFrom(Future.class) || returnType.isAssignableFrom(CompletionStage.class)) {
             return future;
         }
         return future.get();
+    }
+
+    /**
+     * 选择一个实例
+     *
+     * @param instances 实例列表
+     * @return 选择的实例
+     */
+    protected ServiceInstance selectInstance(List<ServiceInstance> instances) {
+        for (ServiceInstance instance : instances) {
+            ServiceInfo serviceInfo = instance.getServiceInfo();
+            if (serviceInfo.getVersion() < proxyInfo.getVersion()) {
+                continue;
+            }
+            if (!instance.getClient().isConnected()) {
+                continue;
+            }
+            return instance;
+        }
+        return null;
     }
 }

@@ -7,7 +7,6 @@ import io.github.xuanyangyang.rpc.core.net.NetConstants;
 import io.github.xuanyangyang.rpc.core.net.NettyClient;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocol;
-import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocolMessageWrapper;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.RpcInvocationInfo;
 
@@ -30,8 +29,7 @@ public class NettyClientDemo {
         invocationInfo.setVersion(1);
         invocationInfo.setArgs(new Object[]{1, 2, 3});
         request.setInvocationInfo(invocationInfo);
-        nettyClient.send(DefaultProtocolMessageWrapper.createProtocolMessage(NetConstants.DEFAULT_PROTOCOL_ID, request));
-
-
+        request.setProtocolId(NetConstants.DEFAULT_PROTOCOL_ID);
+        nettyClient.send(request);
     }
 }

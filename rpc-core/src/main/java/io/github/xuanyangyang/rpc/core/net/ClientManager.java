@@ -1,16 +1,23 @@
 package io.github.xuanyangyang.rpc.core.net;
 
+import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 客户端上下文
+ * 客户端管理
  *
  * @author xuanyangyang
  * @since 2020/10/7 14:52
  */
-public class ClientContext {
+public class ClientManager {
     private final Map<String, Client> clientMap = new ConcurrentHashMap<>();
+    private final ProtocolManager protocolManager;
+
+    public ClientManager(ProtocolManager protocolManager) {
+        this.protocolManager = protocolManager;
+    }
 
     public Client getClient(String id) {
         return clientMap.get(id);
@@ -45,5 +52,9 @@ public class ClientContext {
             }
             client.reconnect();
         }
+    }
+
+    public Client getOrCreateClient(String ip, int port) {
+        return clientMap.computeIfAbsent(Client.createId(ip, port), key -> new NettyClient(ip, port, protocolManager));
     }
 }

@@ -1,5 +1,7 @@
 package io.github.xuanyangyang.rpc.core.protocol.support;
 
+import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -8,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author xuanyangyang
  * @since 2020/10/5 16:08
  */
-public class Request {
+public class Request implements ProtocolMessage {
     /**
      * id
      */
@@ -21,6 +23,10 @@ public class Request {
      * rpc调用信息
      */
     private RpcInvocationInfo invocationInfo;
+    /**
+     * 协议ID
+     */
+    private short protocolId;
 
     public Request(Long id) {
         this.id = id;
@@ -34,6 +40,7 @@ public class Request {
         return ID_CREATE.getAndIncrement();
     }
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -44,5 +51,14 @@ public class Request {
 
     public void setInvocationInfo(RpcInvocationInfo invocationInfo) {
         this.invocationInfo = invocationInfo;
+    }
+
+    @Override
+    public Short getProtocolId() {
+        return protocolId;
+    }
+
+    public void setProtocolId(short protocolId) {
+        this.protocolId = protocolId;
     }
 }

@@ -17,5 +17,11 @@ public class ServiceInstance {
         this.client = client;
     }
 
+    public ServiceInfo getServiceInfo() {
+        return serviceInfo;
+    }
 
+    public Client getClient() {
+        return client;
+    }
 }
