@@ -1,14 +1,14 @@
-package io.github.xuanyangyang.rpc.core.proxy;
+package io.github.xuanyangyang.rpc.core.reference;
 
+import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.info.ServiceInstance;
+import io.github.xuanyangyang.rpc.core.info.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.RpcInvocationInfo;
-import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
-import io.github.xuanyangyang.rpc.core.service.ServiceInstance;
-import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
@@ -19,12 +19,12 @@ import java.util.concurrent.Future;
  * @author xuanyangyang
  * @since 2020/10/6 17:27
  */
-public class RpcProxyHandler implements InvocationHandler {
-    private final ProxyInfo proxyInfo;
+public class RPCProxyHandler implements InvocationHandler {
+    private final RPCReferenceInfo RPCReferenceInfo;
     private final ServiceInstanceManager serviceInstanceManager;
 
-    public RpcProxyHandler(ProxyInfo proxyInfo, ServiceInstanceManager serviceInstanceManager) {
-        this.proxyInfo = proxyInfo;
+    public RPCProxyHandler(RPCReferenceInfo RPCReferenceInfo, ServiceInstanceManager serviceInstanceManager) {
+        this.RPCReferenceInfo = RPCReferenceInfo;
         this.serviceInstanceManager = serviceInstanceManager;
     }
 
@@ -34,24 +34,24 @@ public class RpcProxyHandler implements InvocationHandler {
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 0) {
             if ("toString".equals(methodName)) {
-                return proxyInfo.toString();
+                return RPCReferenceInfo.toString();
             } else if ("hashCode".equals(methodName)) {
-                return proxyInfo.hashCode();
+                return RPCReferenceInfo.hashCode();
             }
         }
 
         Request request = new Request();
-        request.setProtocolId(proxyInfo.getProtocolId());
+        request.setProtocolId(RPCReferenceInfo.getProtocolId());
 
         RpcInvocationInfo invocationInfo = new RpcInvocationInfo();
         invocationInfo.setMethodName(methodName);
         invocationInfo.setArgs(args);
-        invocationInfo.setServiceName(proxyInfo.getName());
-        invocationInfo.setVersion(proxyInfo.getVersion());
+        invocationInfo.setServiceName(RPCReferenceInfo.getName());
+        invocationInfo.setVersion(RPCReferenceInfo.getVersion());
 
         request.setInvocationInfo(invocationInfo);
 
-        List<ServiceInstance> instances = serviceInstanceManager.getInstances(proxyInfo.getName());
+        Collection<ServiceInstance> instances = serviceInstanceManager.getInstances(RPCReferenceInfo.getName());
         ServiceInstance instance = selectInstance(instances);
         CompletableFuture<Object> future = instance.getClient().send(request);
         Class<?> returnType = method.getReturnType();
@@ -67,10 +67,10 @@ public class RpcProxyHandler implements InvocationHandler {
      * @param instances 实例列表
      * @return 选择的实例
      */
-    protected ServiceInstance selectInstance(List<ServiceInstance> instances) {
+    protected ServiceInstance selectInstance(Collection<ServiceInstance> instances) {
         for (ServiceInstance instance : instances) {
             ServiceInfo serviceInfo = instance.getServiceInfo();
-            if (serviceInfo.getVersion() < proxyInfo.getVersion()) {
+            if (serviceInfo.getVersion() < RPCReferenceInfo.getVersion()) {
                 continue;
             }
             if (!instance.getClient().isConnected()) {

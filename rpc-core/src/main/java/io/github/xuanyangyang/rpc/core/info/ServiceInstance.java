@@ -1,4 +1,4 @@
-package io.github.xuanyangyang.rpc.core.service;
+package io.github.xuanyangyang.rpc.core.info;
 
 import io.github.xuanyangyang.rpc.core.net.Client;
 

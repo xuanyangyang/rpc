@@ -1,4 +1,4 @@
-package io.github.xuanyangyang.rpc.core.service;
+package io.github.xuanyangyang.rpc.core.info;
 
 /**
  * 服务信息
@@ -7,6 +7,10 @@ package io.github.xuanyangyang.rpc.core.service;
  * @since 2020/10/6 17:22
  */
 public class ServiceInfo {
+    /**
+     * 服务ID
+     */
+    private String id;
     /**
      * 服务名
      */
@@ -27,10 +31,6 @@ public class ServiceInfo {
      * 端口
      */
     private int port;
-    /**
-     * 服务key
-     */
-    private String serviceKey;
 
     public String getName() {
         return name;
@@ -72,11 +72,11 @@ public class ServiceInfo {
         this.protocolId = protocolId;
     }
 
-    public String getServiceKey() {
-        return serviceKey;
+    public String getId() {
+        return id;
     }
 
-    public void setServiceKey(String serviceKey) {
-        this.serviceKey = serviceKey;
+    public void setId(String id) {
+        this.id = id;
     }
 }

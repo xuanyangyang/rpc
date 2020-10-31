@@ -1,12 +1,12 @@
-package io.github.xuanyangyang.rpc.core.proxy;
+package io.github.xuanyangyang.rpc.core.reference;
 
 /**
- * 代理信息
+ * rpc引用信息
  *
  * @author xuanyangyang
  * @since 2020/10/7 16:48
  */
-public class ProxyInfo {
+public class RPCReferenceInfo {
     /**
      * 服务名
      */
@@ -19,6 +19,10 @@ public class ProxyInfo {
      * 服务版本
      */
     private int version;
+    /**
+     * 引用的class
+     */
+    private Class<?> clz;
 
     public String getName() {
         return name;
@@ -42,5 +46,13 @@ public class ProxyInfo {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public Class<?> getClz() {
+        return clz;
+    }
+
+    public void setClz(Class<?> clz) {
+        this.clz = clz;
     }
 }

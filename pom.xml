@@ -7,7 +7,7 @@
     <groupId>io.github.xuanyangyang</groupId>
     <artifactId>rpc-parent</artifactId>
     <packaging>pom</packaging>
-    <version>${rpc.version}</version>
+    <version>1.0-SNAPSHOT</version>
 
     <modules>
         <module>rpc-core</module>
@@ -19,6 +19,7 @@
         <netty.version>4.1.51.Final</netty.version>
         <rpc.version>1.0-SNAPSHOT</rpc.version>
         <protostuff.version>1.7.2</protostuff.version>
+        <redisson.version>3.13.6</redisson.version>
     </properties>
 
     <dependencyManagement>
@@ -59,6 +60,11 @@
                 <groupId>io.protostuff</groupId>
                 <artifactId>protostuff-runtime</artifactId>
                 <version>${protostuff.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
