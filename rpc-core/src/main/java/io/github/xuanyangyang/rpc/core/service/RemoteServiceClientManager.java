@@ -55,4 +55,12 @@ public class RemoteServiceClientManager {
         Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.getOrDefault(serviceName, Collections.emptyMap());
         return instanceMap.remove(serviceId);
     }
+
+    public void init() {
+        clientManager.init();
+    }
+
+    public void destroy() {
+        clientManager.destroy();
+    }
 }

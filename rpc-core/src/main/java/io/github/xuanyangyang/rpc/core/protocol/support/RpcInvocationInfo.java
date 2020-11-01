@@ -23,6 +23,10 @@ public class RpcInvocationInfo {
      * 参数
      */
     private Object[] args;
+    /**
+     * 方法参数类型
+     */
+    private Class<?>[] parameterTypes;
 
     public String getServiceName() {
         return serviceName;
@@ -54,5 +58,13 @@ public class RpcInvocationInfo {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public Class<?>[] getParameterTypes() {
+        return parameterTypes;
+    }
+
+    public void setParameterTypes(Class<?>[] parameterTypes) {
+        this.parameterTypes = parameterTypes;
     }
 }

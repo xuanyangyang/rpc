@@ -1,4 +1,8 @@
-package io.github.xuanyangyang.rpc.core.service;
+package io.github.xuanyangyang.rpc.spring.service;
+
+import org.springframework.stereotype.Service;
+
+import java.lang.annotation.*;
 
 /**
  * rpc服务
@@ -6,12 +10,11 @@ package io.github.xuanyangyang.rpc.core.service;
  * @author xuanyangyang
  * @since 2020/11/1 00:00
  */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Service
 public @interface RPCService {
-    /**
-     * @return 服务ID
-     */
-    String id() default "";
-
     /**
      * @return 服务名
      */
@@ -25,5 +28,5 @@ public @interface RPCService {
     /**
      * @return 协议ID
      */
-    short protocolId();
+    short protocolId() default 0;
 }

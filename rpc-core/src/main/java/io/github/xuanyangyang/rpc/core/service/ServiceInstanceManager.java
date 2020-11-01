@@ -3,6 +3,7 @@ package io.github.xuanyangyang.rpc.core.service;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 服务实例管理
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author xuanyangyang
  * @since 2020/11/1 17:29
  */
-public class ServiceInstanceManager implements ServiceInfoProvider{
+public class ServiceInstanceManager implements ServiceInfoProvider {
     /**
      * serviceName -> ServiceInstance
      */
@@ -28,8 +29,12 @@ public class ServiceInstanceManager implements ServiceInfoProvider{
         return instanceMap.get(serviceName);
     }
 
+    public boolean hasInstance(String serviceName) {
+        return instanceMap.containsKey(serviceName);
+    }
+
     @Override
     public Collection<ServiceInfo> getServiceInfos() {
-        return null;
+        return instanceMap.values().stream().map(ServiceInstance::getServiceInfo).collect(Collectors.toList());
     }
 }

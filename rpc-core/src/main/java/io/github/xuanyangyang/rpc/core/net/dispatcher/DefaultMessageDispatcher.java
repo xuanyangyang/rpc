@@ -58,6 +58,7 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
             response.setState(Response.STATE_SERVER_ERROR);
             response.setErrMsg(e.getMessage());
         }
+        // todo 异常处理
         channel.send(response);
     }
 }

@@ -12,6 +12,7 @@
     <modules>
         <module>rpc-core</module>
         <module>rpc-demo</module>
+        <module>rpc-spring-boot-starter</module>
     </modules>
 
     <properties>
@@ -39,6 +40,11 @@
             <dependency>
                 <groupId>io.github.xuanyangyang</groupId>
                 <artifactId>rpc-demo</artifactId>
+                <version>${rpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.xuanyangyang</groupId>
+                <artifactId>rpc-spring-boot-starter</artifactId>
                 <version>${rpc.version}</version>
             </dependency>
             <dependency>

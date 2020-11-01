@@ -29,25 +29,10 @@ public class LocalServiceInstance implements ServiceInstance {
     }
 
     @Override
-    public String getServiceName() {
-        return serviceInfo.getName();
-    }
-
-    @Override
     public Object invoke(RpcInvocationInfo invocationInfo) {
-        Object[] args = invocationInfo.getArgs();
-        Class<?>[] argTypes;
-        if (args == null || args.length == 0) {
-            argTypes = null;
-        } else {
-            argTypes = new Class<?>[args.length];
-            for (int i = 0; i < args.length; i++) {
-                argTypes[i] = args[i].getClass();
-            }
-        }
         try {
-            Method method = service.getClass().getMethod(invocationInfo.getMethodName(), argTypes);
-            return method.invoke(service, args);
+            Method method = service.getClass().getMethod(invocationInfo.getMethodName(), invocationInfo.getParameterTypes());
+            return method.invoke(service, invocationInfo.getArgs());
         } catch (NoSuchMethodException e) {
             String message = "在" + invocationInfo.getServiceName() + "服务里找不到" + invocationInfo.getMethodName() + "方法";
             throw new RPCException(message, e);
@@ -59,5 +44,10 @@ public class LocalServiceInstance implements ServiceInstance {
     @Override
     public ServiceInfo getServiceInfo() {
         return serviceInfo;
+    }
+
+    @Override
+    public Object getRealInstance() {
+        return service;
     }
 }

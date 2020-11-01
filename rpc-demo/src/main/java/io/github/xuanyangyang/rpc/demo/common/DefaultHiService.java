@@ -1,6 +1,8 @@
-package io.github.xuanyangyang.rpc.demo;
+package io.github.xuanyangyang.rpc.demo.common;
 
 /**
+ * 默认hi 服务
+ *
  * @author xuanyangyang
  * @since 2020/11/1 00:49
  */

@@ -37,4 +37,9 @@ public class DispatcherHandler extends ChannelInboundHandlerAdapter {
             executor.execute(() -> messageDispatcher.dispatch(NettyUtils.getChannel(ctx.channel()), msg));
         }
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+    }
 }

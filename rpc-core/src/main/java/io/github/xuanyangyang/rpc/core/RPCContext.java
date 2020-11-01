@@ -86,8 +86,9 @@ public class RPCContext {
     }
 
     private void initServiceInfos() {
-        Collection<RPCReferenceInfo> RPCReferenceInfos = RPCReferenceInfoProvider.getProxyInfos();
-        for (RPCReferenceInfo rpcReferenceInfo : RPCReferenceInfos) {
+        remoteServiceClientManager.init();
+        Collection<RPCReferenceInfo> referenceInfos = RPCReferenceInfoProvider.getProxyInfos();
+        for (RPCReferenceInfo rpcReferenceInfo : referenceInfos) {
             Collection<ServiceInfo> serviceInfos = registry.getServiceInfos(rpcReferenceInfo.getName());
             for (ServiceInfo serviceInfo : serviceInfos) {
                 remoteServiceClientManager.addInstance(serviceInfo);
@@ -97,5 +98,6 @@ public class RPCContext {
 
     public void destroy() {
         registry.destroy();
+        remoteServiceClientManager.destroy();
     }
 }

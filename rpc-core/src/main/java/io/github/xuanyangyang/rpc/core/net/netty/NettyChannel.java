@@ -4,6 +4,7 @@ import io.github.xuanyangyang.rpc.core.future.DefaultFuture;
 import io.github.xuanyangyang.rpc.core.net.Channel;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
 import io.github.xuanyangyang.rpc.core.protocol.support.Response;
+import io.netty.channel.ChannelFutureListener;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -32,15 +33,19 @@ public class NettyChannel implements Channel {
 
     @Override
     public <T> CompletableFuture<T> send(ProtocolMessage message) {
-        DefaultFuture<T> future = DefaultFuture.newFuture(message.getId());
+        DefaultFuture<T> futureResult = DefaultFuture.newFuture(message.getId());
         if (!isConnected()) {
             Response response = new Response(message.getId());
             response.setState(Response.STATE_CLIENT_ERROR);
             response.setData("通道已关闭");
-            return future;
+            return futureResult;
         }
-        channel.writeAndFlush(message);
-        return future;
+        channel.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
+            if (future.cause() != null) {
+                futureResult.completeExceptionally(future.cause());
+            }
+        });
+        return futureResult;
     }
 
     @Override

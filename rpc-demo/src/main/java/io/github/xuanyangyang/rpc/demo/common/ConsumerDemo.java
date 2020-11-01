@@ -1,4 +1,4 @@
-package io.github.xuanyangyang.rpc.demo;
+package io.github.xuanyangyang.rpc.demo.common;
 
 import io.github.xuanyangyang.rpc.core.RPCContext;
 import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
@@ -22,7 +22,7 @@ import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import java.util.Collections;
 
 /**
- * 消费组demo
+ * 消费者demo
  *
  * @author xuanyangyang
  * @since 2020/11/1 00:29

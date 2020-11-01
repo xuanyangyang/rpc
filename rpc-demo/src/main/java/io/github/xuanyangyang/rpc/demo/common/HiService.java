@@ -1,4 +1,4 @@
-package io.github.xuanyangyang.rpc.demo;
+package io.github.xuanyangyang.rpc.demo.common;
 
 /**
  * 嗨服务

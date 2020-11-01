@@ -13,7 +13,9 @@ public interface ServiceInstance {
     /**
      * @return 服务名
      */
-    String getServiceName();
+    default String getServiceName() {
+        return getServiceInfo().getName();
+    }
 
     /**
      * 调用
@@ -27,4 +29,11 @@ public interface ServiceInstance {
      * @return 服务信息
      */
     ServiceInfo getServiceInfo();
+
+    /**
+     * 获取实际实例
+     *
+     * @return 实际实例
+     */
+    Object getRealInstance();
 }

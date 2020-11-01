@@ -1,4 +1,4 @@
-package io.github.xuanyangyang.rpc.demo;
+package io.github.xuanyangyang.rpc.demo.common;
 
 import io.github.xuanyangyang.rpc.core.RPCContext;
 import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
