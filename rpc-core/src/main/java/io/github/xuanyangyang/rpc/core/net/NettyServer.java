@@ -1,7 +1,8 @@
 package io.github.xuanyangyang.rpc.core.net;
 
-import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -18,17 +19,19 @@ import org.slf4j.LoggerFactory;
  */
 public class NettyServer {
     private final ProtocolManager protocolManager;
-
+    private final ServiceInstanceManager serviceInstanceManager;
     private final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
-    public NettyServer(ProtocolManager protocolManager) {
+    public NettyServer(ProtocolManager protocolManager, ServiceInstanceManager serviceInstanceManager) {
         this.protocolManager = protocolManager;
+        this.serviceInstanceManager = serviceInstanceManager;
     }
 
     public void bind(int port) {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
         NioEventLoopGroup workGroup = new NioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap();
+        DispatcherHandler dispatcherHandler = new DispatcherHandler(serviceInstanceManager);
         serverBootstrap.group(bossGroup, workGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<>() {
@@ -37,14 +40,14 @@ public class NettyServer {
                         ch.pipeline()
                                 .addLast(new ProtocolDecoder(protocolManager))
                                 .addLast(new ProtocolEncoder(protocolManager))
-                                .addLast(new EchoHandler());
+                                .addLast(dispatcherHandler);
                     }
                 });
         try {
             serverBootstrap.bind(port).sync();
         } catch (InterruptedException e) {
             logger.warn("等待绑定端口被打断");
-            throw new RpcException(e);
+            throw new RPCException(e);
         }
         logger.info("服务启动成功，端口：{}", port);
     }

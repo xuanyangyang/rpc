@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.registry;
 
-import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 import java.util.Collection;
 

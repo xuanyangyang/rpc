@@ -1,9 +1,10 @@
 package io.github.xuanyangyang.rpc.core.net;
 
-import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.future.DefaultFuture;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
+import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -32,11 +33,16 @@ public class NettyClient implements Client {
     private final Map<String, Object> attributeMap = new ConcurrentHashMap<>();
     private final String ip;
     private final int port;
+    /**
+     * 服务实例管理
+     */
+    private final ServiceInstanceManager serviceInstanceManager;
 
-    public NettyClient(String ip, int port, ProtocolManager protocolManager) {
+    public NettyClient(String ip, int port, ProtocolManager protocolManager, ServiceInstanceManager serviceInstanceManager) {
         this.ip = ip;
         this.port = port;
         this.protocolManager = protocolManager;
+        this.serviceInstanceManager = serviceInstanceManager;
     }
 
     public void send(Object message) {
@@ -113,6 +119,7 @@ public class NettyClient implements Client {
     private synchronized void connect(String ip, int port) {
         NioEventLoopGroup eventLoopGroup = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
+        DispatcherHandler dispatcherHandler = new DispatcherHandler(serviceInstanceManager);
         bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<>() {
@@ -121,14 +128,14 @@ public class NettyClient implements Client {
                         ch.pipeline()
                                 .addLast(new ProtocolDecoder(protocolManager))
                                 .addLast(new ProtocolEncoder(protocolManager))
-                                .addLast(new EchoHandler());
+                                .addLast(dispatcherHandler);
                     }
                 });
         try {
             channel = bootstrap.connect(ip, port).sync().channel();
         } catch (InterruptedException e) {
             logger.warn("等待连接{}:{}被打断", ip, port);
-            throw new RpcException(e);
+            throw new RPCException(e);
         }
         logger.info("连接{}:{}成功", ip, port);
     }

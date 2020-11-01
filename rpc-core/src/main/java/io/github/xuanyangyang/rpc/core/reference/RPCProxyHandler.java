@@ -1,8 +1,8 @@
 package io.github.xuanyangyang.rpc.core.reference;
 
-import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
-import io.github.xuanyangyang.rpc.core.info.ServiceInstance;
-import io.github.xuanyangyang.rpc.core.info.ServiceInstanceManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.RemoteServiceClient;
+import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.RpcInvocationInfo;
 
@@ -21,11 +21,11 @@ import java.util.concurrent.Future;
  */
 public class RPCProxyHandler implements InvocationHandler {
     private final RPCReferenceInfo RPCReferenceInfo;
-    private final ServiceInstanceManager serviceInstanceManager;
+    private final RemoteServiceClientManager remoteServiceClientManager;
 
-    public RPCProxyHandler(RPCReferenceInfo RPCReferenceInfo, ServiceInstanceManager serviceInstanceManager) {
+    public RPCProxyHandler(RPCReferenceInfo RPCReferenceInfo, RemoteServiceClientManager remoteServiceClientManager) {
         this.RPCReferenceInfo = RPCReferenceInfo;
-        this.serviceInstanceManager = serviceInstanceManager;
+        this.remoteServiceClientManager = remoteServiceClientManager;
     }
 
     @Override
@@ -51,8 +51,8 @@ public class RPCProxyHandler implements InvocationHandler {
 
         request.setInvocationInfo(invocationInfo);
 
-        Collection<ServiceInstance> instances = serviceInstanceManager.getInstances(RPCReferenceInfo.getName());
-        ServiceInstance instance = selectInstance(instances);
+        Collection<RemoteServiceClient> instances = remoteServiceClientManager.getInstances(RPCReferenceInfo.getName());
+        RemoteServiceClient instance = selectInstance(instances);
         CompletableFuture<Object> future = instance.getClient().send(request);
         Class<?> returnType = method.getReturnType();
         if (returnType.isAssignableFrom(Future.class) || returnType.isAssignableFrom(CompletionStage.class)) {
@@ -67,8 +67,8 @@ public class RPCProxyHandler implements InvocationHandler {
      * @param instances 实例列表
      * @return 选择的实例
      */
-    protected ServiceInstance selectInstance(Collection<ServiceInstance> instances) {
-        for (ServiceInstance instance : instances) {
+    protected RemoteServiceClient selectInstance(Collection<RemoteServiceClient> instances) {
+        for (RemoteServiceClient instance : instances) {
             ServiceInfo serviceInfo = instance.getServiceInfo();
             if (serviceInfo.getVersion() < RPCReferenceInfo.getVersion()) {
                 continue;

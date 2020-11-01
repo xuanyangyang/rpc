@@ -2,7 +2,7 @@ package io.github.xuanyangyang.rpc.core.registry.support.zookeeper;
 
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.ServiceInfoListener;
-import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 import java.util.Collection;
 

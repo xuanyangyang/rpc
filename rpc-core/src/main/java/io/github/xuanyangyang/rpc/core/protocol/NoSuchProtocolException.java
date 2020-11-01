@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.protocol;
 
-import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 
 /**
  * 找不到协议异常
@@ -8,7 +8,7 @@ import io.github.xuanyangyang.rpc.core.common.RpcException;
  * @author xuanyangyang
  * @since 2020/10/4 17:20
  */
-public class NoSuchProtocolException extends RpcException {
+public class NoSuchProtocolException extends RPCException {
     /**
      * 协议ID
      */

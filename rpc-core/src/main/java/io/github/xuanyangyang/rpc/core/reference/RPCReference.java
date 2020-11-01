@@ -22,7 +22,7 @@ public @interface RPCReference {
     /**
      * @return 协议ID
      */
-    short protocolId() default NetConstants.DEFAULT_PROTOCOL_ID;
+    short protocolId() default 0;
 
     /**
      * @return 版本

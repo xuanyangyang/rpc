@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.reference;
 
-import io.github.xuanyangyang.rpc.core.info.ServiceInstanceManager;
+import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
 
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -13,12 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2020/10/31 23:36
  */
 public class RPCProxyFactory {
-    private final ServiceInstanceManager serviceInstanceManager;
+    private final RemoteServiceClientManager remoteServiceClientManager;
 
     private final Map<String, Object> rpcProxyMap = new ConcurrentHashMap<>();
 
-    public RPCProxyFactory(ServiceInstanceManager serviceInstanceManager) {
-        this.serviceInstanceManager = serviceInstanceManager;
+    public RPCProxyFactory(RemoteServiceClientManager remoteServiceClientManager) {
+        this.remoteServiceClientManager = remoteServiceClientManager;
     }
 
     @SuppressWarnings("unchecked")
@@ -27,7 +27,7 @@ public class RPCProxyFactory {
     }
 
     private Object createProxy(RPCReferenceInfo referenceInfo) {
-        return Proxy.newProxyInstance(referenceInfo.getClz().getClassLoader(), referenceInfo.getClz().getInterfaces(),
-                new RPCProxyHandler(referenceInfo, serviceInstanceManager));
+        return Proxy.newProxyInstance(referenceInfo.getClz().getClassLoader(), new Class[]{referenceInfo.getClz()},
+                new RPCProxyHandler(referenceInfo, remoteServiceClientManager));
     }
 }

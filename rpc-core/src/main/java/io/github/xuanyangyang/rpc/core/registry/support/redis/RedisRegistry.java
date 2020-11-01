@@ -3,7 +3,7 @@ package io.github.xuanyangyang.rpc.core.registry.support.redis;
 import io.github.xuanyangyang.rpc.core.net.NetConstants;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.ServiceInfoListener;
-import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 import org.redisson.Redisson;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;

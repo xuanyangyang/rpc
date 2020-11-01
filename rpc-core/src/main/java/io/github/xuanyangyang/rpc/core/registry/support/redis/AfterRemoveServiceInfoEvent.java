@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.registry.support.redis;
 
-import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 /**
  * 删除服务之后事件

@@ -1,6 +1,7 @@
 package io.github.xuanyangyang.rpc.core.net;
 
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,9 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientManager {
     private final Map<String, Client> clientMap = new ConcurrentHashMap<>();
     private final ProtocolManager protocolManager;
+    private final ServiceInstanceManager serviceInstanceManager;
 
-    public ClientManager(ProtocolManager protocolManager) {
+    public ClientManager(ProtocolManager protocolManager, ServiceInstanceManager serviceInstanceManager) {
         this.protocolManager = protocolManager;
+        this.serviceInstanceManager = serviceInstanceManager;
     }
 
     public Client getClient(String id) {
@@ -55,6 +58,6 @@ public class ClientManager {
     }
 
     public Client getOrCreateClient(String ip, int port) {
-        return clientMap.computeIfAbsent(Client.createId(ip, port), key -> new NettyClient(ip, port, protocolManager));
+        return clientMap.computeIfAbsent(Client.createId(ip, port), key -> new NettyClient(ip, port, protocolManager, serviceInstanceManager));
     }
 }

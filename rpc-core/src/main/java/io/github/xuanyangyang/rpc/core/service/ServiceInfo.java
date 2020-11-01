@@ -1,4 +1,4 @@
-package io.github.xuanyangyang.rpc.core.info;
+package io.github.xuanyangyang.rpc.core.service;
 
 /**
  * 服务信息

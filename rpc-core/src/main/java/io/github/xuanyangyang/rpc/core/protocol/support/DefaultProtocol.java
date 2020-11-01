@@ -4,7 +4,7 @@ import io.github.xuanyangyang.rpc.core.codec.Codec;
 import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.NoSuchCodecException;
-import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.net.NetConstants;
 import io.github.xuanyangyang.rpc.core.protocol.Protocol;
 import io.netty.buffer.ByteBuf;
@@ -72,7 +72,7 @@ public class DefaultProtocol implements Protocol {
         byte[] actualMagic = new byte[MAGIC_LENGTH];
         buffer.readBytes(actualMagic);
         if (MAGIC[0] != actualMagic[0] || MAGIC[1] != actualMagic[1]) {
-            throw new RpcException("魔术字对不上！！！期待的魔术字：" + Arrays.toString(MAGIC) + "，实际收到的魔术字：" + Arrays.toString(actualMagic));
+            throw new RPCException("魔术字对不上！！！期待的魔术字：" + Arrays.toString(MAGIC) + "，实际收到的魔术字：" + Arrays.toString(actualMagic));
         }
         if (buffer.readableBytes() < BODY_LENGTH) {
             return DecodeResult.NEED_MORE_INPUT;
@@ -130,7 +130,7 @@ public class DefaultProtocol implements Protocol {
     private Header decodeHeader(ByteBuf buffer) {
         int protocolVersion = buffer.readInt();
         if (DefaultProtocol.protocolVersion < protocolVersion) {
-            throw new RpcException("当前协议版本过低，不能解析该信息。当前协议版本:" + DefaultProtocol.protocolVersion + ",收到的信息协议版本:" + protocolVersion);
+            throw new RPCException("当前协议版本过低，不能解析该信息。当前协议版本:" + DefaultProtocol.protocolVersion + ",收到的信息协议版本:" + protocolVersion);
         }
         short codecId = buffer.readShort();
         Codec codec = codecManager.getCodec(codecId);
@@ -140,7 +140,7 @@ public class DefaultProtocol implements Protocol {
         byte type = buffer.readByte();
         long id = buffer.readLong();
         if (TYPE_REQUEST != type && TYPE_RESPONSE != type) {
-            throw new RpcException("无法解析的协议类型:" + type);
+            throw new RPCException("无法解析的协议类型:" + type);
         }
         Header header = new Header();
         header.setProtocolVersion(protocolVersion);
@@ -166,7 +166,7 @@ public class DefaultProtocol implements Protocol {
             encodeHeader(buffer, response.getId(), TYPE_RESPONSE);
             encodeResponse(buffer, response);
         } else {
-            throw new RpcException("目前不支持除了Request，Response之外的消息类型，收到的消息类型：" + message.getClass());
+            throw new RPCException("目前不支持除了Request，Response之外的消息类型，收到的消息类型：" + message.getClass());
         }
         int length = buffer.writerIndex() - bodyWriterIndex - BODY_LENGTH;
         buffer.setInt(bodyWriterIndex, length);

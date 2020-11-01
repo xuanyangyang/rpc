@@ -1,4 +1,4 @@
-package io.github.xuanyangyang.rpc.core.info;
+package io.github.xuanyangyang.rpc.core.service;
 
 import io.github.xuanyangyang.rpc.core.net.Client;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
@@ -10,31 +10,31 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 服务实例管理
+ * 远程服务实例管理
  *
  * @author xuanyangyang
  * @since 2020/10/27 13:02
  */
-public class ServiceInstanceManager {
+public class RemoteServiceClientManager {
     /**
      * serviceName -> serviceId -> serviceInstance
      */
-    private final Map<String, Map<String, ServiceInstance>> name2InstanceMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, RemoteServiceClient>> name2InstanceMap = new ConcurrentHashMap<>();
     private final ClientManager clientManager;
 
-    public ServiceInstanceManager(ClientManager clientManager) {
+    public RemoteServiceClientManager(ClientManager clientManager) {
         this.clientManager = clientManager;
     }
 
-    public ServiceInstance addInstance(ServiceInfo serviceInfo) {
-        ServiceInstance instance = getInstance(serviceInfo);
+    public RemoteServiceClient addInstance(ServiceInfo serviceInfo) {
+        RemoteServiceClient instance = getInstance(serviceInfo);
         if (instance != null) {
             return instance;
         }
         Client client = clientManager.getOrCreateClient(serviceInfo.getIp(), serviceInfo.getPort());
         client.connect();
-        instance = new ServiceInstance(serviceInfo, client);
-        Map<String, ServiceInstance> instanceMap = name2InstanceMap.computeIfAbsent(serviceInfo.getName(), key -> new ConcurrentHashMap<>());
+        instance = new RemoteServiceClient(serviceInfo, client);
+        Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.computeIfAbsent(serviceInfo.getName(), key -> new ConcurrentHashMap<>());
         instanceMap.put(instance.getServiceInfo().getId(), instance);
         return instance;
     }
@@ -43,20 +43,20 @@ public class ServiceInstanceManager {
         return getInstance(serviceInfo) != null;
     }
 
-    public ServiceInstance getInstance(ServiceInfo serviceInfo) {
-        Map<String, ServiceInstance> instanceMap = name2InstanceMap.get(serviceInfo.getName());
+    public RemoteServiceClient getInstance(ServiceInfo serviceInfo) {
+        Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.get(serviceInfo.getName());
         if (CollectionUtils.isEmpty(instanceMap)) {
             return null;
         }
         return instanceMap.get(serviceInfo.getId());
     }
 
-    public Collection<ServiceInstance> getInstances(String serviceName) {
+    public Collection<RemoteServiceClient> getInstances(String serviceName) {
         return name2InstanceMap.getOrDefault(serviceName, Collections.emptyMap()).values();
     }
 
-    public ServiceInstance removeInstance(String serviceName, String serviceId) {
-        Map<String, ServiceInstance> instanceMap = name2InstanceMap.get(serviceName);
+    public RemoteServiceClient removeInstance(String serviceName, String serviceId) {
+        Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.get(serviceName);
         if (CollectionUtils.isEmpty(instanceMap)) {
             return null;
         }

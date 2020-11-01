@@ -4,8 +4,6 @@ import io.github.xuanyangyang.rpc.core.RPCContext;
 import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
-import io.github.xuanyangyang.rpc.core.info.ServiceInfoProvider;
-import io.github.xuanyangyang.rpc.core.info.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.NetConstants;
 import io.github.xuanyangyang.rpc.core.net.NettyServer;
@@ -16,6 +14,9 @@ import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfo;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
+import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfoProvider;
+import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
 import java.util.Collections;
 
@@ -34,10 +35,11 @@ public class ConsumerDemo {
 
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
+        ServiceInstanceManager serviceInstanceManager = new ServiceInstanceManager();
+        ClientManager clientManager = new ClientManager(protocolManager, serviceInstanceManager);
 
-        ClientManager clientManager = new ClientManager(protocolManager);
+        RemoteServiceClientManager remoteServiceClientManager = new RemoteServiceClientManager(clientManager);
 
-        ServiceInstanceManager serviceInstanceManager = new ServiceInstanceManager(clientManager);
 
         ServiceInfoProvider serviceInfoProvider = Collections::emptyList;
 
@@ -48,10 +50,11 @@ public class ConsumerDemo {
         rpcReferenceInfo.setVersion(0);
         RPCReferenceInfoProvider rpcReferenceInfoProvider = () -> Collections.singletonList(rpcReferenceInfo);
 
-        RPCProxyFactory rpcProxyFactory = new RPCProxyFactory(serviceInstanceManager);
+        RPCProxyFactory rpcProxyFactory = new RPCProxyFactory(remoteServiceClientManager);
         HiService hiService = rpcProxyFactory.getOrCreateProxy(rpcReferenceInfo);
-        RPCContext rpcContext = new RPCContext(new NettyServer(protocolManager), registry, serviceInstanceManager, serviceInfoProvider, rpcReferenceInfoProvider);
+        RPCContext rpcContext = new RPCContext(new NettyServer(protocolManager, serviceInstanceManager), registry, remoteServiceClientManager, serviceInfoProvider, rpcReferenceInfoProvider);
         rpcContext.init();
-        hiService.sayHi();
+        String res = hiService.sayHi();
+        System.out.println("收到：" + res);
     }
 }

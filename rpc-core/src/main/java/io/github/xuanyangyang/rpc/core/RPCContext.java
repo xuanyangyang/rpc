@@ -1,8 +1,8 @@
 package io.github.xuanyangyang.rpc.core;
 
-import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
-import io.github.xuanyangyang.rpc.core.info.ServiceInfoProvider;
-import io.github.xuanyangyang.rpc.core.info.ServiceInstanceManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfoProvider;
+import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.net.NettyServer;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfo;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
@@ -29,7 +29,7 @@ public class RPCContext {
     /**
      * 服务实例管理
      */
-    private final ServiceInstanceManager serviceInstanceManager;
+    private final RemoteServiceClientManager remoteServiceClientManager;
     /**
      * 服务信息提供者
      */
@@ -39,12 +39,12 @@ public class RPCContext {
      */
     private final RPCReferenceInfoProvider RPCReferenceInfoProvider;
 
-    public RPCContext(NettyServer server, Registry registry, ServiceInstanceManager serviceInstanceManager,
+    public RPCContext(NettyServer server, Registry registry, RemoteServiceClientManager remoteServiceClientManager,
                       ServiceInfoProvider serviceInfoProvider,
                       RPCReferenceInfoProvider RPCReferenceInfoProvider) {
         this.server = server;
         this.registry = registry;
-        this.serviceInstanceManager = serviceInstanceManager;
+        this.remoteServiceClientManager = remoteServiceClientManager;
         this.serviceInfoProvider = serviceInfoProvider;
         this.RPCReferenceInfoProvider = RPCReferenceInfoProvider;
     }
@@ -75,12 +75,12 @@ public class RPCContext {
         registry.addServiceInfoListener(new ServiceInfoListener() {
             @Override
             public void afterRemoveService(ServiceInfo serviceInfo) {
-                serviceInstanceManager.removeInstance(serviceInfo.getName(), serviceInfo.getId());
+                remoteServiceClientManager.removeInstance(serviceInfo.getName(), serviceInfo.getId());
             }
 
             @Override
             public void afterAddService(ServiceInfo serviceInfo) {
-                serviceInstanceManager.addInstance(serviceInfo);
+                remoteServiceClientManager.addInstance(serviceInfo);
             }
         });
     }
@@ -90,7 +90,7 @@ public class RPCContext {
         for (RPCReferenceInfo rpcReferenceInfo : RPCReferenceInfos) {
             Collection<ServiceInfo> serviceInfos = registry.getServiceInfos(rpcReferenceInfo.getName());
             for (ServiceInfo serviceInfo : serviceInfos) {
-                serviceInstanceManager.addInstance(serviceInfo);
+                remoteServiceClientManager.addInstance(serviceInfo);
             }
         }
     }

@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.future;
 
-import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.protocol.support.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class DefaultFuture<T> extends CompletableFuture<T> {
         if (response.getState() == Response.STATE_OK) {
             this.complete((T) response.getData());
         } else {
-            this.completeExceptionally(new RpcException(response.getErrMsg()));
+            this.completeExceptionally(new RPCException(response.getErrMsg()));
         }
     }
 

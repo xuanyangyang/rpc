@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.codec;
 
-import io.github.xuanyangyang.rpc.core.common.RpcException;
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 
 /**
  * 找不到codec
@@ -8,7 +8,7 @@ import io.github.xuanyangyang.rpc.core.common.RpcException;
  * @author xuanyangyang
  * @since 2020/10/4 18:27
  */
-public class NoSuchCodecException extends RpcException {
+public class NoSuchCodecException extends RPCException {
     /**
      * codecId
      */

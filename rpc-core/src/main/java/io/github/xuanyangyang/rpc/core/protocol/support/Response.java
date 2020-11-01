@@ -37,6 +37,10 @@ public class Response implements ProtocolMessage {
      * 客户端错误
      */
     public static final byte STATE_CLIENT_ERROR = 1;
+    /**
+     * 服务端错误
+     */
+    public static final byte STATE_SERVER_ERROR = 2;
 
     public Response(Long id) {
         this.id = id;

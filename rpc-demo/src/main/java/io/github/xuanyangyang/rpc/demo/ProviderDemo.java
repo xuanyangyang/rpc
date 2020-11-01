@@ -4,18 +4,19 @@ import io.github.xuanyangyang.rpc.core.RPCContext;
 import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
-import io.github.xuanyangyang.rpc.core.info.ServiceInfo;
-import io.github.xuanyangyang.rpc.core.info.ServiceInfoProvider;
-import io.github.xuanyangyang.rpc.core.info.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.NetConstants;
+import io.github.xuanyangyang.rpc.core.net.NetUtils;
 import io.github.xuanyangyang.rpc.core.net.NettyServer;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocol;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
+import io.github.xuanyangyang.rpc.core.service.*;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Collections;
  * @since 2020/11/1 00:43
  */
 public class ProviderDemo {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnknownHostException {
         Registry registry = new RedisRegistry();
 
         DefaultCodecManager codecManager = new DefaultCodecManager();
@@ -33,23 +34,25 @@ public class ProviderDemo {
 
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
+        ServiceInstanceManager serviceInstanceManager = new ServiceInstanceManager();
+        ClientManager clientManager = new ClientManager(protocolManager, serviceInstanceManager);
 
-        ClientManager clientManager = new ClientManager(protocolManager);
+        RemoteServiceClientManager remoteServiceClientManager = new RemoteServiceClientManager(clientManager);
 
-        ServiceInstanceManager serviceInstanceManager = new ServiceInstanceManager(clientManager);
 
-        ServiceInfoProvider serviceInfoProvider = () -> {
-            ServiceInfo serviceInfo = new ServiceInfo();
-            serviceInfo.setName(HiService.class.getName());
-            serviceInfo.setProtocolId(NetConstants.DEFAULT_PROTOCOL_ID);
-            serviceInfo.setVersion(0);
-            serviceInfo.setIp("localhost");
-            serviceInfo.setPort(10000);
-            return Collections.singletonList(serviceInfo);
-        };
+        ServiceInfo serviceInfo = new ServiceInfo();
+        serviceInfo.setName(HiService.class.getName());
+        serviceInfo.setProtocolId(NetConstants.DEFAULT_PROTOCOL_ID);
+        serviceInfo.setVersion(0);
+        InetAddress localAddress = NetUtils.getLocalAddress();
+        serviceInfo.setIp(localAddress.getHostAddress());
+        serviceInfo.setPort(10000);
+        serviceInfo.setId(serviceInfo.getName() + ":" + serviceInfo.getIp() + ":" + serviceInfo.getPort());
+        LocalServiceInstance hiServiceInstance = new LocalServiceInstance(serviceInfo, new DefaultHiService());
+        serviceInstanceManager.addInstance(hiServiceInstance);
+        ServiceInfoProvider serviceInfoProvider = () -> Collections.singletonList(serviceInfo);
         RPCReferenceInfoProvider rpcReferenceInfoProvider = Collections::emptyList;
-
-        RPCContext rpcContext = new RPCContext(new NettyServer(protocolManager), registry, serviceInstanceManager, serviceInfoProvider, rpcReferenceInfoProvider);
+        RPCContext rpcContext = new RPCContext(new NettyServer(protocolManager, serviceInstanceManager), registry, remoteServiceClientManager, serviceInfoProvider, rpcReferenceInfoProvider);
         rpcContext.init();
     }
 }
