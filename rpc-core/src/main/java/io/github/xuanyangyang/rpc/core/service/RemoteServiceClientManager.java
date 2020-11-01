@@ -2,7 +2,6 @@ package io.github.xuanyangyang.rpc.core.service;
 
 import io.github.xuanyangyang.rpc.core.net.Client;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,10 +43,7 @@ public class RemoteServiceClientManager {
     }
 
     public RemoteServiceClient getInstance(ServiceInfo serviceInfo) {
-        Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.get(serviceInfo.getName());
-        if (CollectionUtils.isEmpty(instanceMap)) {
-            return null;
-        }
+        Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.getOrDefault(serviceInfo.getName(), Collections.emptyMap());
         return instanceMap.get(serviceInfo.getId());
     }
 
@@ -56,10 +52,7 @@ public class RemoteServiceClientManager {
     }
 
     public RemoteServiceClient removeInstance(String serviceName, String serviceId) {
-        Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.get(serviceName);
-        if (CollectionUtils.isEmpty(instanceMap)) {
-            return null;
-        }
+        Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.getOrDefault(serviceName, Collections.emptyMap());
         return instanceMap.remove(serviceId);
     }
 }

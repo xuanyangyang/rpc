@@ -1,5 +1,8 @@
 package io.github.xuanyangyang.rpc.core.net;
 
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;

@@ -6,7 +6,8 @@ import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.NetConstants;
-import io.github.xuanyangyang.rpc.core.net.NettyServer;
+import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocol;
 import io.github.xuanyangyang.rpc.core.reference.RPCProxyFactory;
@@ -36,7 +37,7 @@ public class ConsumerDemo {
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
         ServiceInstanceManager serviceInstanceManager = new ServiceInstanceManager();
-        ClientManager clientManager = new ClientManager(protocolManager, serviceInstanceManager);
+        ClientManager clientManager = new ClientManager(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
 
         RemoteServiceClientManager remoteServiceClientManager = new RemoteServiceClientManager(clientManager);
 
@@ -52,7 +53,7 @@ public class ConsumerDemo {
 
         RPCProxyFactory rpcProxyFactory = new RPCProxyFactory(remoteServiceClientManager);
         HiService hiService = rpcProxyFactory.getOrCreateProxy(rpcReferenceInfo);
-        RPCContext rpcContext = new RPCContext(new NettyServer(protocolManager, serviceInstanceManager), registry, remoteServiceClientManager, serviceInfoProvider, rpcReferenceInfoProvider);
+        RPCContext rpcContext = new RPCContext(new NettyServer(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager)), registry, remoteServiceClientManager, serviceInfoProvider, rpcReferenceInfoProvider);
         rpcContext.init();
         String res = hiService.sayHi();
         System.out.println("收到：" + res);

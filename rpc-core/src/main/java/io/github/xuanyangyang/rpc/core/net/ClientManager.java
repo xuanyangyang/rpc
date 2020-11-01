@@ -1,10 +1,15 @@
 package io.github.xuanyangyang.rpc.core.net;
 
+import io.github.xuanyangyang.rpc.core.net.dispatcher.MessageDispatcher;
+import io.github.xuanyangyang.rpc.core.net.netty.NettyClient;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
-import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 客户端管理
@@ -15,11 +20,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientManager {
     private final Map<String, Client> clientMap = new ConcurrentHashMap<>();
     private final ProtocolManager protocolManager;
-    private final ServiceInstanceManager serviceInstanceManager;
+    private final ScheduledExecutorService scheduledExecutorService;
+    private final MessageDispatcher messageDispatcher;
 
-    public ClientManager(ProtocolManager protocolManager, ServiceInstanceManager serviceInstanceManager) {
+    public ClientManager(ProtocolManager protocolManager, MessageDispatcher messageDispatcher) {
+        this(protocolManager, messageDispatcher, Executors.newSingleThreadScheduledExecutor(new DefaultThreadFactory("客户端检查线程")));
+    }
+
+    public ClientManager(ProtocolManager protocolManager, MessageDispatcher messageDispatcher, ScheduledExecutorService scheduledExecutorService) {
         this.protocolManager = protocolManager;
-        this.serviceInstanceManager = serviceInstanceManager;
+        this.scheduledExecutorService = scheduledExecutorService;
+        this.messageDispatcher = messageDispatcher;
     }
 
     public Client getClient(String id) {
@@ -45,7 +56,11 @@ public class ClientManager {
     }
 
     public void init() {
+        scheduledExecutorService.scheduleAtFixedRate(this::checkClient, 0, 10, TimeUnit.SECONDS);
+    }
 
+    public void destroy() {
+        scheduledExecutorService.shutdown();
     }
 
     private void checkClient() {
@@ -58,6 +73,6 @@ public class ClientManager {
     }
 
     public Client getOrCreateClient(String ip, int port) {
-        return clientMap.computeIfAbsent(Client.createId(ip, port), key -> new NettyClient(ip, port, protocolManager, serviceInstanceManager));
+        return clientMap.computeIfAbsent(Client.createId(ip, port), key -> new NettyClient(ip, port, protocolManager, messageDispatcher));
     }
 }

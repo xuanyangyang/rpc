@@ -1,13 +1,13 @@
 package io.github.xuanyangyang.rpc.core;
 
-import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
-import io.github.xuanyangyang.rpc.core.service.ServiceInfoProvider;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
-import io.github.xuanyangyang.rpc.core.net.NettyServer;
+import io.github.xuanyangyang.rpc.core.net.Server;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfo;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.ServiceInfoListener;
+import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfoProvider;
 
 import java.util.Collection;
 
@@ -21,7 +21,7 @@ public class RPCContext {
     /**
      * 服务
      */
-    private final NettyServer server;
+    private final Server server;
     /**
      * 注册中心
      */
@@ -39,7 +39,7 @@ public class RPCContext {
      */
     private final RPCReferenceInfoProvider RPCReferenceInfoProvider;
 
-    public RPCContext(NettyServer server, Registry registry, RemoteServiceClientManager remoteServiceClientManager,
+    public RPCContext(Server server, Registry registry, RemoteServiceClientManager remoteServiceClientManager,
                       ServiceInfoProvider serviceInfoProvider,
                       RPCReferenceInfoProvider RPCReferenceInfoProvider) {
         this.server = server;
