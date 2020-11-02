@@ -1,11 +1,10 @@
 package io.github.xuanyangyang.rpc.core.protocol.support;
 
 import io.github.xuanyangyang.rpc.core.codec.Codec;
-import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.NoSuchCodecException;
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.common.RPCException;
-import io.github.xuanyangyang.rpc.core.net.NetConstants;
 import io.github.xuanyangyang.rpc.core.protocol.Protocol;
 import io.netty.buffer.ByteBuf;
 
@@ -45,7 +44,7 @@ public class DefaultProtocol implements Protocol {
     /**
      * 当前codecID
      */
-    private Short codecId = CodecConstants.DEFAULT_CODEC_ID;
+    private Short codecId = RPCConstants.DEFAULT_CODEC_ID;
     /**
      * 请求类型
      */
@@ -61,7 +60,7 @@ public class DefaultProtocol implements Protocol {
 
     @Override
     public Short getId() {
-        return NetConstants.DEFAULT_PROTOCOL_ID;
+        return RPCConstants.DEFAULT_PROTOCOL_ID;
     }
 
     @Override

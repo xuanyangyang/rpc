@@ -25,6 +25,8 @@ public class NettyServer implements Server {
     private final ProtocolManager protocolManager;
     private final MessageDispatcher messageDispatcher;
     private final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+    private NioEventLoopGroup bossGroup;
+    private NioEventLoopGroup workGroup;
 
     public NettyServer(ProtocolManager protocolManager, MessageDispatcher messageDispatcher) {
         this.protocolManager = protocolManager;
@@ -33,8 +35,8 @@ public class NettyServer implements Server {
 
     @Override
     public void bind(int port) {
-        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        NioEventLoopGroup workGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup(1);
+        workGroup = new NioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         DispatcherHandler dispatcherHandler = new DispatcherHandler(messageDispatcher);
         serverBootstrap.group(bossGroup, workGroup)
@@ -55,5 +57,15 @@ public class NettyServer implements Server {
             throw new RPCException(e);
         }
         logger.info("服务启动成功，端口：{}", port);
+    }
+
+    @Override
+    public void shutdown() {
+        if (bossGroup != null) {
+            bossGroup.shutdownGracefully();
+        }
+        if (workGroup != null) {
+            workGroup.shutdownGracefully();
+        }
     }
 }

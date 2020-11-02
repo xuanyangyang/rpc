@@ -13,4 +13,9 @@ public interface Server {
      * @param port 端口
      */
     void bind(int port);
+
+    /**
+     * 停服
+     */
+    void shutdown();
 }

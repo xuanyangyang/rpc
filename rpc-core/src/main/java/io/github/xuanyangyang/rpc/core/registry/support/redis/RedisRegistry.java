@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.registry.support.redis;
 
-import io.github.xuanyangyang.rpc.core.net.NetConstants;
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.ServiceInfoListener;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
@@ -98,7 +98,7 @@ public class RedisRegistry implements Registry {
         serviceInfo.setName("test");
         serviceInfo.setPort(1);
         serviceInfo.setVersion(1);
-        serviceInfo.setProtocolId(NetConstants.DEFAULT_PROTOCOL_ID);
+        serviceInfo.setProtocolId(RPCConstants.DEFAULT_PROTOCOL_ID);
         serviceInfo.setIp("localhost");
         redisRegistry.addServiceInfo(serviceInfo);
 

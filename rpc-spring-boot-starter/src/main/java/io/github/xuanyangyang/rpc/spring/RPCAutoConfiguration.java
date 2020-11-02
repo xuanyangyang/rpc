@@ -1,10 +1,10 @@
 package io.github.xuanyangyang.rpc.spring;
 
 import io.github.xuanyangyang.rpc.core.RPCContext;
-import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.Server;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
@@ -106,7 +106,7 @@ public class RPCAutoConfiguration {
 
     @Bean
     public ProtostuffCodec protostuffCodec() {
-        return new ProtostuffCodec(CodecConstants.DEFAULT_CODEC_ID);
+        return new ProtostuffCodec(RPCConstants.DEFAULT_CODEC_ID);
     }
 
     @Bean

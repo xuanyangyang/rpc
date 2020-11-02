@@ -37,16 +37,16 @@ public class RPCContext {
     /**
      * rpc引用信息提供者
      */
-    private final RPCReferenceInfoProvider RPCReferenceInfoProvider;
+    private final RPCReferenceInfoProvider rpcReferenceInfoProvider;
 
     public RPCContext(Server server, Registry registry, RemoteServiceClientManager remoteServiceClientManager,
                       ServiceInfoProvider serviceInfoProvider,
-                      RPCReferenceInfoProvider RPCReferenceInfoProvider) {
+                      RPCReferenceInfoProvider rpcReferenceInfoProvider) {
         this.server = server;
         this.registry = registry;
         this.remoteServiceClientManager = remoteServiceClientManager;
         this.serviceInfoProvider = serviceInfoProvider;
-        this.RPCReferenceInfoProvider = RPCReferenceInfoProvider;
+        this.rpcReferenceInfoProvider = rpcReferenceInfoProvider;
     }
 
     public void init() {
@@ -87,7 +87,7 @@ public class RPCContext {
 
     private void initServiceInfos() {
         remoteServiceClientManager.init();
-        Collection<RPCReferenceInfo> referenceInfos = RPCReferenceInfoProvider.getProxyInfos();
+        Collection<RPCReferenceInfo> referenceInfos = rpcReferenceInfoProvider.getProxyInfos();
         for (RPCReferenceInfo rpcReferenceInfo : referenceInfos) {
             Collection<ServiceInfo> serviceInfos = registry.getServiceInfos(rpcReferenceInfo.getName());
             for (ServiceInfo serviceInfo : serviceInfos) {
@@ -97,6 +97,7 @@ public class RPCContext {
     }
 
     public void destroy() {
+        server.shutdown();
         registry.destroy();
         remoteServiceClientManager.destroy();
     }

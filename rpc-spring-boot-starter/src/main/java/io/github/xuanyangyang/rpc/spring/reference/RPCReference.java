@@ -1,7 +1,5 @@
 package io.github.xuanyangyang.rpc.spring.reference;
 
-import io.github.xuanyangyang.rpc.core.net.NetConstants;
-
 import java.lang.annotation.*;
 
 /**

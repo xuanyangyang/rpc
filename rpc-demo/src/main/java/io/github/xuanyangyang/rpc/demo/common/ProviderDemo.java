@@ -1,11 +1,10 @@
 package io.github.xuanyangyang.rpc.demo.common;
 
 import io.github.xuanyangyang.rpc.core.RPCContext;
-import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
-import io.github.xuanyangyang.rpc.core.net.NetConstants;
 import io.github.xuanyangyang.rpc.core.net.NetUtils;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
 import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
@@ -31,7 +30,7 @@ public class ProviderDemo {
         Registry registry = new RedisRegistry();
 
         DefaultCodecManager codecManager = new DefaultCodecManager();
-        codecManager.addCodec(new ProtostuffCodec(CodecConstants.DEFAULT_CODEC_ID));
+        codecManager.addCodec(new ProtostuffCodec(RPCConstants.DEFAULT_CODEC_ID));
 
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
@@ -43,7 +42,7 @@ public class ProviderDemo {
 
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(HiService.class.getName());
-        serviceInfo.setProtocolId(NetConstants.DEFAULT_PROTOCOL_ID);
+        serviceInfo.setProtocolId(RPCConstants.DEFAULT_PROTOCOL_ID);
         serviceInfo.setVersion(0);
         InetAddress localAddress = NetUtils.getLocalAddress();
         serviceInfo.setIp(localAddress.getHostAddress());

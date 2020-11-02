@@ -1,13 +1,12 @@
 package io.github.xuanyangyang.rpc.demo.common;
 
 import io.github.xuanyangyang.rpc.core.RPCContext;
-import io.github.xuanyangyang.rpc.core.codec.CodecConstants;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
-import io.github.xuanyangyang.rpc.core.net.NetConstants;
-import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
+import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocol;
 import io.github.xuanyangyang.rpc.core.reference.RPCProxyFactory;
@@ -32,7 +31,7 @@ public class ConsumerDemo {
         Registry registry = new RedisRegistry();
 
         DefaultCodecManager codecManager = new DefaultCodecManager();
-        codecManager.addCodec(new ProtostuffCodec(CodecConstants.DEFAULT_CODEC_ID));
+        codecManager.addCodec(new ProtostuffCodec(RPCConstants.DEFAULT_CODEC_ID));
 
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
@@ -47,7 +46,7 @@ public class ConsumerDemo {
         RPCReferenceInfo rpcReferenceInfo = new RPCReferenceInfo();
         rpcReferenceInfo.setClz(HiService.class);
         rpcReferenceInfo.setName(HiService.class.getName());
-        rpcReferenceInfo.setProtocolId(NetConstants.DEFAULT_PROTOCOL_ID);
+        rpcReferenceInfo.setProtocolId(RPCConstants.DEFAULT_PROTOCOL_ID);
         rpcReferenceInfo.setVersion(0);
         RPCReferenceInfoProvider rpcReferenceInfoProvider = () -> Collections.singletonList(rpcReferenceInfo);
 

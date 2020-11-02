@@ -1,5 +1,6 @@
 package io.github.xuanyangyang.rpc.core.net;
 
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.protocol.NoSuchProtocolException;
 import io.github.xuanyangyang.rpc.core.protocol.Protocol;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
@@ -25,7 +26,7 @@ public class ProtocolDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         do {
-            if (in.readableBytes() < NetConstants.ID_LENGTH) {
+            if (in.readableBytes() < RPCConstants.ID_LENGTH) {
                 break;
             }
             int readerIndex = in.readerIndex();
