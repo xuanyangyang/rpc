@@ -1,40 +1,39 @@
 package io.github.xuanyangyang.rpc.core.service;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
 /**
  * 服务实例管理
  *
  * @author xuanyangyang
- * @since 2020/11/1 17:29
+ * @since 2020/11/3 12:51
  */
-public class ServiceInstanceManager implements ServiceInfoProvider {
+public interface ServiceInstanceManager extends ServiceInfoProvider {
     /**
-     * serviceName -> ServiceInstance
+     * 添加实例
+     *
+     * @param serviceInstance 新的实例
      */
-    private final Map<String, ServiceInstance> instanceMap = new ConcurrentHashMap<>();
+    void addInstance(ServiceInstance serviceInstance);
 
-    public void addInstance(ServiceInstance serviceInstance) {
-        instanceMap.put(serviceInstance.getServiceName(), serviceInstance);
-    }
+    /**
+     * 通过服务名移除实例
+     *
+     * @param serviceName 服务名
+     */
+    void removeInstance(String serviceName);
 
-    public void removeInstance(String serviceName) {
-        instanceMap.remove(serviceName);
-    }
+    /**
+     * 通过服务名获取实例
+     *
+     * @param serviceName 服务名
+     * @return 服务实例
+     */
+    ServiceInstance getInstance(String serviceName);
 
-    public ServiceInstance getInstance(String serviceName) {
-        return instanceMap.get(serviceName);
-    }
-
-    public boolean hasInstance(String serviceName) {
-        return instanceMap.containsKey(serviceName);
-    }
-
-    @Override
-    public Collection<ServiceInfo> getServiceInfos() {
-        return instanceMap.values().stream().map(ServiceInstance::getServiceInfo).collect(Collectors.toList());
-    }
+    /**
+     * 是否有对应服务名的实例
+     *
+     * @param serviceName 服务名
+     * @return 是否有对应服务名的实例
+     */
+    boolean hasInstance(String serviceName);
 }

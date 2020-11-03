@@ -5,6 +5,7 @@ import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
 import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
+import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
 import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
@@ -14,9 +15,7 @@ import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfo;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
-import io.github.xuanyangyang.rpc.core.service.ServiceInfoProvider;
-import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
+import io.github.xuanyangyang.rpc.core.service.*;
 
 import java.util.Collections;
 
@@ -35,10 +34,10 @@ public class ConsumerDemo {
 
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
-        ServiceInstanceManager serviceInstanceManager = new ServiceInstanceManager();
-        ClientManager clientManager = new ClientManager(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
+        ServiceInstanceManager serviceInstanceManager = new DefaultServiceInstanceManager();
+        ClientManager clientManager = new DefaultClientManager(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
 
-        RemoteServiceClientManager remoteServiceClientManager = new RemoteServiceClientManager(clientManager);
+        RemoteServiceClientManager remoteServiceClientManager = new DefaultRemoteServiceClientManager(clientManager);
 
 
         ServiceInfoProvider serviceInfoProvider = Collections::emptyList;

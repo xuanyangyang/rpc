@@ -5,6 +5,7 @@ import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
 import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
+import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.NetUtils;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
 import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
@@ -34,10 +35,10 @@ public class ProviderDemo {
 
         DefaultProtocolManager protocolManager = new DefaultProtocolManager();
         protocolManager.addProtocol(new DefaultProtocol(codecManager));
-        ServiceInstanceManager serviceInstanceManager = new ServiceInstanceManager();
-        ClientManager clientManager = new ClientManager(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
+        ServiceInstanceManager serviceInstanceManager = new DefaultServiceInstanceManager();
+        ClientManager clientManager = new DefaultClientManager(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
 
-        RemoteServiceClientManager remoteServiceClientManager = new RemoteServiceClientManager(clientManager);
+        RemoteServiceClientManager remoteServiceClientManager = new DefaultRemoteServiceClientManager(clientManager);
 
 
         ServiceInfo serviceInfo = new ServiceInfo();

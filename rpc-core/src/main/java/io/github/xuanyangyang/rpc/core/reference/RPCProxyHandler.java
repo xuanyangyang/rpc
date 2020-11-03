@@ -53,8 +53,8 @@ public class RPCProxyHandler implements InvocationHandler {
 
         request.setInvocationInfo(invocationInfo);
 
-        Collection<RemoteServiceClient> instances = remoteServiceClientManager.getInstances(rpcReferenceInfo.getName());
-        RemoteServiceClient instance = selectInstance(instances);
+        Collection<RemoteServiceClient> clients = remoteServiceClientManager.getClients(rpcReferenceInfo.getName());
+        RemoteServiceClient instance = selectClient(clients);
         if (instance == null) {
             throw new RPCException("没有可用的" + rpcReferenceInfo.getName() + "服务");
         }
@@ -67,21 +67,21 @@ public class RPCProxyHandler implements InvocationHandler {
     }
 
     /**
-     * 选择一个实例
+     * 选择一个客户端
      *
-     * @param instances 实例列表
-     * @return 选择的实例
+     * @param clients 客户端列表
+     * @return 选择的客户端
      */
-    protected RemoteServiceClient selectInstance(Collection<RemoteServiceClient> instances) {
-        for (RemoteServiceClient instance : instances) {
-            ServiceInfo serviceInfo = instance.getServiceInfo();
+    protected RemoteServiceClient selectClient(Collection<RemoteServiceClient> clients) {
+        for (RemoteServiceClient client : clients) {
+            ServiceInfo serviceInfo = client.getServiceInfo();
             if (serviceInfo.getVersion() < rpcReferenceInfo.getVersion()) {
                 continue;
             }
-            if (!instance.getClient().isConnected()) {
+            if (!client.getClient().isConnected()) {
                 continue;
             }
-            return instance;
+            return client;
         }
         return null;
     }

@@ -11,6 +11,8 @@ import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executor;
+
 /**
  * 消息分发器
  *
@@ -23,6 +25,10 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
      */
     private final ServiceInstanceManager serviceInstanceManager;
     /**
+     * 执行器
+     */
+    private Executor executor;
+    /**
      * 日志
      */
     private static final Logger logger = LoggerFactory.getLogger(DefaultMessageDispatcher.class);
@@ -33,6 +39,14 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
 
     @Override
     public void dispatch(Channel channel, Object message) {
+        if (executor == null) {
+            dispatch0(channel, message);
+        } else {
+            executor.execute(() -> dispatch0(channel, message));
+        }
+    }
+
+    private void dispatch0(Channel channel, Object message) {
         if (message instanceof Request) {
             dispatchRequest(channel, (Request) message);
         } else if (message instanceof Response) {
@@ -60,5 +74,13 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
         }
         // todo 异常处理
         channel.send(response);
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
     }
 }

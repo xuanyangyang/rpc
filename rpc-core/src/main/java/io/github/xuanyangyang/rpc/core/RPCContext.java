@@ -75,12 +75,12 @@ public class RPCContext {
         registry.addServiceInfoListener(new ServiceInfoListener() {
             @Override
             public void afterRemoveService(ServiceInfo serviceInfo) {
-                remoteServiceClientManager.removeInstance(serviceInfo.getName(), serviceInfo.getId());
+                remoteServiceClientManager.removeClient(serviceInfo.getName(), serviceInfo.getId());
             }
 
             @Override
             public void afterAddService(ServiceInfo serviceInfo) {
-                remoteServiceClientManager.addInstance(serviceInfo);
+                remoteServiceClientManager.addClient(serviceInfo);
             }
         });
     }
@@ -91,13 +91,16 @@ public class RPCContext {
         for (RPCReferenceInfo rpcReferenceInfo : referenceInfos) {
             Collection<ServiceInfo> serviceInfos = registry.getServiceInfos(rpcReferenceInfo.getName());
             for (ServiceInfo serviceInfo : serviceInfos) {
-                remoteServiceClientManager.addInstance(serviceInfo);
+                remoteServiceClientManager.addClient(serviceInfo);
             }
         }
     }
 
     public void destroy() {
         server.shutdown();
+        for (ServiceInfo serviceInfo : serviceInfoProvider.getServiceInfos()) {
+            registry.removeServiceInfo(serviceInfo.getName(), serviceInfo.getId());
+        }
         registry.destroy();
         remoteServiceClientManager.destroy();
     }

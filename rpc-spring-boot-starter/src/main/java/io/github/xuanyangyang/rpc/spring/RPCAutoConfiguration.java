@@ -6,6 +6,7 @@ import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
 import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
+import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.Server;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.MessageDispatcher;
@@ -16,16 +17,20 @@ import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocol;
 import io.github.xuanyangyang.rpc.core.reference.RPCProxyFactory;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
-import io.github.xuanyangyang.rpc.core.service.ServiceInfoProvider;
-import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
+import io.github.xuanyangyang.rpc.core.service.*;
+import io.github.xuanyangyang.rpc.spring.common.SpringConstants;
 import io.github.xuanyangyang.rpc.spring.config.RPCConfig;
 import io.github.xuanyangyang.rpc.spring.reference.AnnotationRPCReferenceInfoProvider;
 import io.github.xuanyangyang.rpc.spring.service.RPCServiceBeanPostProcessor;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * rpc自动配置
@@ -37,14 +42,24 @@ import org.springframework.context.annotation.Bean;
 public class RPCAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean(ServiceInstanceManager.class)
     public ServiceInstanceManager serviceInstanceManager() {
-        return new ServiceInstanceManager();
+        return new DefaultServiceInstanceManager();
     }
 
     @Bean
     @ConditionalOnMissingBean(MessageDispatcher.class)
-    public MessageDispatcher messageDispatcher(ServiceInstanceManager serviceInstanceManager) {
-        return new DefaultMessageDispatcher(serviceInstanceManager);
+    public MessageDispatcher messageDispatcher(ServiceInstanceManager serviceInstanceManager, @Qualifier(SpringConstants.MESSAGE_EXECUTOR) Executor executor) {
+        DefaultMessageDispatcher messageDispatcher = new DefaultMessageDispatcher(serviceInstanceManager);
+        messageDispatcher.setExecutor(executor);
+        return messageDispatcher;
+    }
+
+    @Bean
+    @ConditionalOnBean(MessageDispatcher.class)
+    @ConditionalOnMissingBean(name = SpringConstants.MESSAGE_EXECUTOR)
+    public Executor messageExecutor() {
+        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, new DefaultThreadFactory("消息执行线程"));
     }
 
     @Bean
@@ -60,13 +75,15 @@ public class RPCAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(ClientManager.class)
     public ClientManager clientManager(ProtocolManager protocolManager, MessageDispatcher messageDispatcher) {
-        return new ClientManager(protocolManager, messageDispatcher);
+        return new DefaultClientManager(protocolManager, messageDispatcher);
     }
 
     @Bean
+    @ConditionalOnMissingBean(RemoteServiceClientManager.class)
     public RemoteServiceClientManager remoteServiceClientManager(ClientManager clientManager) {
-        return new RemoteServiceClientManager(clientManager);
+        return new DefaultRemoteServiceClientManager(clientManager);
     }
 
     @Bean
