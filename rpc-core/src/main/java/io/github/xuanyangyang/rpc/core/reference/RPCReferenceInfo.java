@@ -1,58 +1,27 @@
 package io.github.xuanyangyang.rpc.core.reference;
 
 /**
- * rpc引用信息
- *
  * @author xuanyangyang
- * @since 2020/10/7 16:48
+ * @since 2020/11/3 17:22
  */
-public class RPCReferenceInfo {
+public interface RPCReferenceInfo {
     /**
-     * 服务名
+     * @return 服务名
      */
-    private String name;
+    String getName();
+
     /**
-     * 协议id
+     * @return 协议id
      */
-    private Short protocolId;
+    Short getProtocolId();
+
     /**
-     * 服务版本
+     * @return 服务版本
      */
-    private int version;
+    int getVersion();
+
     /**
-     * 引用的class
+     * @return 引用的接口class
      */
-    private Class<?> clz;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Short getProtocolId() {
-        return protocolId;
-    }
-
-    public void setProtocolId(Short protocolId) {
-        this.protocolId = protocolId;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
-    public Class<?> getClz() {
-        return clz;
-    }
-
-    public void setClz(Class<?> clz) {
-        this.clz = clz;
-    }
+    Class<?> getClz();
 }

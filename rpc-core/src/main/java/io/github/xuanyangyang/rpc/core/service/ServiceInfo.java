@@ -1,5 +1,7 @@
 package io.github.xuanyangyang.rpc.core.service;
 
+import java.util.Objects;
+
 /**
  * 服务信息
  *
@@ -78,5 +80,19 @@ public class ServiceInfo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ServiceInfo that = (ServiceInfo) o;
+        return id.equals(that.id) &&
+                name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

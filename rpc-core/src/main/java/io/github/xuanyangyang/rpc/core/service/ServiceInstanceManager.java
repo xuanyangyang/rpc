@@ -1,12 +1,14 @@
 package io.github.xuanyangyang.rpc.core.service;
 
+import java.util.Collection;
+
 /**
  * 服务实例管理
  *
  * @author xuanyangyang
  * @since 2020/11/3 12:51
  */
-public interface ServiceInstanceManager extends ServiceInfoProvider {
+public interface ServiceInstanceManager {
     /**
      * 添加实例
      *
@@ -36,4 +38,11 @@ public interface ServiceInstanceManager extends ServiceInfoProvider {
      * @return 是否有对应服务名的实例
      */
     boolean hasInstance(String serviceName);
+
+    /**
+     * 获取服务信息集合
+     *
+     * @return 服务信息集合
+     */
+    Collection<ServiceInfo> getServiceInfos();
 }

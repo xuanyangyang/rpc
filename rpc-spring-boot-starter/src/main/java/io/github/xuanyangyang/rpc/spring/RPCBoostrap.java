@@ -34,7 +34,7 @@ public class RPCBoostrap implements DisposableBean {
         ConfigurableApplicationContext applicationContext = event.getApplicationContext();
         registryCodec(applicationContext);
         registryProtocol(applicationContext);
-        rpcContext.init();
+        rpcContext.start();
     }
 
     private void registryCodec(ConfigurableApplicationContext context) {
@@ -53,6 +53,6 @@ public class RPCBoostrap implements DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        rpcContext.destroy();
+        rpcContext.stop();
     }
 }

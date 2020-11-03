@@ -1,5 +1,6 @@
 package io.github.xuanyangyang.rpc.spring;
 
+import io.github.xuanyangyang.rpc.core.DefaultRPCContext;
 import io.github.xuanyangyang.rpc.core.RPCContext;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
@@ -14,10 +15,15 @@ import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocol;
+import io.github.xuanyangyang.rpc.core.reference.DefaultRPCProxyFactory;
+import io.github.xuanyangyang.rpc.core.reference.DefaultRPCReferenceManager;
 import io.github.xuanyangyang.rpc.core.reference.RPCProxyFactory;
-import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
+import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
-import io.github.xuanyangyang.rpc.core.service.*;
+import io.github.xuanyangyang.rpc.core.service.DefaultRemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
+import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.spring.common.SpringConstants;
 import io.github.xuanyangyang.rpc.spring.config.RPCConfig;
 import io.github.xuanyangyang.rpc.spring.reference.AnnotationRPCReferenceInfoProvider;
@@ -87,21 +93,21 @@ public class RPCAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(RPCProxyFactory.class)
     public RPCProxyFactory rpcProxyFactory(RemoteServiceClientManager remoteServiceClientManager) {
-        return new RPCProxyFactory(remoteServiceClientManager);
+        return new DefaultRPCProxyFactory(remoteServiceClientManager);
     }
 
     @Bean
-    public AnnotationRPCReferenceInfoProvider rpcReferenceInfoProvider(RPCProxyFactory rpcProxyFactory) {
-        return new AnnotationRPCReferenceInfoProvider(rpcProxyFactory);
+    public AnnotationRPCReferenceInfoProvider rpcReferenceInfoProvider(RPCReferenceManager rpcReferenceManager) {
+        return new AnnotationRPCReferenceInfoProvider(rpcReferenceManager);
     }
 
     @Bean
     @ConditionalOnMissingBean(RPCContext.class)
-    public RPCContext rpcContext(Server server, Registry registry, RemoteServiceClientManager remoteServiceClientManager,
-                                 ServiceInfoProvider serviceInfoProvider,
-                                 RPCReferenceInfoProvider RPCReferenceInfoProvider) {
-        return new RPCContext(server, registry, remoteServiceClientManager, serviceInfoProvider, RPCReferenceInfoProvider);
+    public RPCContext rpcContext(Server server, Registry registry, ServiceInstanceManager serviceInstanceManager, RemoteServiceClientManager remoteServiceClientManager,
+                                 RPCReferenceManager referenceInfoManager) {
+        return new DefaultRPCContext(server, registry, serviceInstanceManager, remoteServiceClientManager, referenceInfoManager);
     }
 
     @Bean
@@ -129,5 +135,11 @@ public class RPCAutoConfiguration {
     @Bean
     public DefaultProtocol defaultProtocol(CodecManager codecManager) {
         return new DefaultProtocol(codecManager);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(RPCReferenceManager.class)
+    public RPCReferenceManager referenceManager(RPCProxyFactory rpcProxyFactory) {
+        return new DefaultRPCReferenceManager(rpcProxyFactory);
     }
 }

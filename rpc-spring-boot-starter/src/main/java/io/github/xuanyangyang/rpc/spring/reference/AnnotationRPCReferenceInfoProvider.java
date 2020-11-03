@@ -1,17 +1,12 @@
 package io.github.xuanyangyang.rpc.spring.reference;
 
 import io.github.xuanyangyang.rpc.core.common.RPCException;
-import io.github.xuanyangyang.rpc.core.reference.RPCProxyFactory;
-import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfo;
-import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfoProvider;
+import io.github.xuanyangyang.rpc.core.reference.DefaultRPCReferenceInfo;
+import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.util.ReflectionUtils;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * 注解引用提供
@@ -19,18 +14,11 @@ import java.util.List;
  * @author xuanyangyang
  * @since 2020/11/1 22:43
  */
-public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBeanPostProcessor, RPCReferenceInfoProvider {
-    private final List<RPCReferenceInfo> referenceInfoList = new LinkedList<>();
+public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBeanPostProcessor {
+    private final RPCReferenceManager referenceManager;
 
-    private final RPCProxyFactory rpcProxyFactory;
-
-    public AnnotationRPCReferenceInfoProvider(RPCProxyFactory rpcProxyFactory) {
-        this.rpcProxyFactory = rpcProxyFactory;
-    }
-
-    @Override
-    public Collection<RPCReferenceInfo> getProxyInfos() {
-        return referenceInfoList;
+    public AnnotationRPCReferenceInfoProvider(RPCReferenceManager referenceManager) {
+        this.referenceManager = referenceManager;
     }
 
     @Override
@@ -46,7 +34,7 @@ public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBea
                 if (!fieldClass.isInterface()) {
                     throw new RPCException("不支持非接口RPC引用");
                 }
-                RPCReferenceInfo rpcReferenceInfo = new RPCReferenceInfo();
+                DefaultRPCReferenceInfo rpcReferenceInfo = new DefaultRPCReferenceInfo();
                 rpcReferenceInfo.setClz(fieldClass);
                 rpcReferenceInfo.setProtocolId(rpcReference.protocolId());
                 if (rpcReference.serviceName().isEmpty()) {
@@ -55,8 +43,8 @@ public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBea
                     rpcReferenceInfo.setName(rpcReference.serviceName());
                 }
                 rpcReferenceInfo.setVersion(rpcReference.version());
-                referenceInfoList.add(rpcReferenceInfo);
-                Object proxy = rpcProxyFactory.getOrCreateProxy(rpcReferenceInfo);
+                referenceManager.addInfo(rpcReferenceInfo);
+                Object proxy = referenceManager.getOrCreateReference(rpcReferenceInfo.getName());
                 field.setAccessible(true);
                 field.set(bean, proxy);
             });
