@@ -11,7 +11,10 @@ import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 
 /**
  * 消息分发器
@@ -67,7 +70,17 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
         }
         try {
             Object result = instance.invoke(invocationInfo);
-            response.setData(result);
+            if (result instanceof CompletionStage) {
+                ((CompletionStage<?>) result).thenAccept(response::setData);
+            } else if (result instanceof Future) {
+                try {
+                    response.setData(((Future<?>) result).get());
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RPCException(invocationInfo.getServiceName() + "执行" + invocationInfo.getMethodName() + "方法异常", e);
+                }
+            } else {
+                response.setData(result);
+            }
         } catch (RPCException e) {
             response.setState(Response.STATE_SERVER_ERROR);
             response.setErrMsg(e.getMessage());

@@ -35,6 +35,8 @@ public class SpringConsumerDemo {
         String result = springConsumerDemo.helloService.hello("xyy");
         System.out.println(result);
 
+        springConsumerDemo.calcService.multiply(6, 7).thenAccept(res -> System.out.println("6 * 7 = " + res));
+
         System.out.println(springConsumerDemo.calcService.add(5, 7));
 
         System.out.println(springConsumerDemo.calcService.minus(10, 7));

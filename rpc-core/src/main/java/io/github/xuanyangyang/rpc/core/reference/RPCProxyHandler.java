@@ -60,7 +60,7 @@ public class RPCProxyHandler implements InvocationHandler {
         }
         CompletableFuture<Object> future = instance.getClient().send(request);
         Class<?> returnType = method.getReturnType();
-        if (returnType.isAssignableFrom(Future.class) || returnType.isAssignableFrom(CompletionStage.class)) {
+        if (Future.class.isAssignableFrom(returnType) || CompletionStage.class.isAssignableFrom(returnType)) {
             return future;
         }
         return future.get();
