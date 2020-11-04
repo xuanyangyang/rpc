@@ -3,8 +3,8 @@ package io.github.xuanyangyang.rpc.core.reference;
 import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.RpcInvocationInfo;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClient;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClient;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 import java.lang.reflect.InvocationHandler;

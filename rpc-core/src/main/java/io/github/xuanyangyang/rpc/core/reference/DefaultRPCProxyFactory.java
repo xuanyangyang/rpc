@@ -1,6 +1,6 @@
 package io.github.xuanyangyang.rpc.core.reference;
 
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
 
 import java.lang.reflect.Proxy;
 import java.util.Map;

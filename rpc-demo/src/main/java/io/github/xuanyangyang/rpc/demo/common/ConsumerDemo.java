@@ -19,9 +19,9 @@ import io.github.xuanyangyang.rpc.core.reference.*;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisConfig;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
-import io.github.xuanyangyang.rpc.core.service.DefaultRemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.DefaultRemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
 /**

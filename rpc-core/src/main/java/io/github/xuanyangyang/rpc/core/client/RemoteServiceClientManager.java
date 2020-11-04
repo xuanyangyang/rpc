@@ -1,4 +1,6 @@
-package io.github.xuanyangyang.rpc.core.service;
+package io.github.xuanyangyang.rpc.core.client;
+
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 import java.util.Collection;
 

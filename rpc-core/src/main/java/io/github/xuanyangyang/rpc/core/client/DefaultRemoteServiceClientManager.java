@@ -1,7 +1,8 @@
-package io.github.xuanyangyang.rpc.core.service;
+package io.github.xuanyangyang.rpc.core.client;
 
 import io.github.xuanyangyang.rpc.core.net.Client;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +34,7 @@ public class DefaultRemoteServiceClientManager implements RemoteServiceClientMan
         }
         Client client = clientManager.getOrCreateClient(serviceInfo.getIp(), serviceInfo.getPort());
         client.connect();
-        remoteServiceClient = new RemoteServiceClient(serviceInfo, client);
+        remoteServiceClient = new DefaultRemoteServiceClient(serviceInfo, client);
         Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.computeIfAbsent(serviceInfo.getName(), key -> new ConcurrentHashMap<>());
         instanceMap.put(remoteServiceClient.getServiceInfo().getId(), remoteServiceClient);
         return remoteServiceClient;

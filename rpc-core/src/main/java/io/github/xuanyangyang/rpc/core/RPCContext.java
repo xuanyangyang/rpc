@@ -1,7 +1,7 @@
 package io.github.xuanyangyang.rpc.core;
 
 import io.github.xuanyangyang.rpc.core.registry.Registry;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
 /**

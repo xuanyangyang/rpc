@@ -6,7 +6,7 @@ import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfo;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.ServiceInfoListener;
-import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
