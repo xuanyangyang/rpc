@@ -11,8 +11,8 @@ public interface RPCProxyFactory {
      * 创建代理
      *
      * @param referenceInfo 引用信息
-     * @param <T>           {@link RPCReferenceInfo#getClass()}接口的类型
-     * @return {@link RPCReferenceInfo#getClass()}接口的类型的代理
+     * @param <T>           接口的类型
+     * @return 接口的类型的代理
      */
     <T> T getOrCreateProxy(RPCReferenceInfo referenceInfo);
 }

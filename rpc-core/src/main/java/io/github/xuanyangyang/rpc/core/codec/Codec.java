@@ -19,6 +19,7 @@ public interface Codec {
      *
      * @param byteBuf byteBuf
      * @return 对象
+     * @throws Exception 解码异常
      */
     Object decode(ByteBuf byteBuf) throws Exception;
 
@@ -27,6 +28,7 @@ public interface Codec {
      *
      * @param byteBuf byteBuf
      * @param obj     对象
+     * @throws Exception 编译异常
      */
     void encode(ByteBuf byteBuf, Object obj) throws Exception;
 }

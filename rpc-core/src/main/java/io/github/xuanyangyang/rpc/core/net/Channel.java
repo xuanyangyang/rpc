@@ -16,6 +16,8 @@ public interface Channel {
      * 发送请求
      *
      * @param message 请求
+     * @param <T>     结果类型
+     * @return 结果future
      */
     <T> CompletableFuture<T> send(ProtocolMessage message);
 
@@ -25,6 +27,8 @@ public interface Channel {
      * @param message  请求
      * @param timeout  超时时间
      * @param timeUnit 时间单位
+     * @param <T>      结果类型
+     * @return 结果future
      */
     <T> CompletableFuture<T> send(ProtocolMessage message, long timeout, TimeUnit timeUnit);
 

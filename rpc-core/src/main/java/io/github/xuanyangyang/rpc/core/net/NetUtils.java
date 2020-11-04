@@ -1,8 +1,5 @@
 package io.github.xuanyangyang.rpc.core.net;
 
-import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
-
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -19,7 +16,7 @@ public class NetUtils {
      * 获取本地地址
      *
      * @return 本地地址
-     * @throws UnknownHostException
+     * @throws UnknownHostException 找不到地址异常
      */
     public static InetAddress getLocalAddress() throws UnknownHostException {
         try {
