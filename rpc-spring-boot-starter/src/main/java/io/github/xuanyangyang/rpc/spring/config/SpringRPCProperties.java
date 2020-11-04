@@ -1,6 +1,9 @@
 package io.github.xuanyangyang.rpc.spring.config;
 
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * rpc 配置
@@ -13,7 +16,15 @@ public class SpringRPCProperties {
     /**
      * 绑定端口
      */
-    private int port = 10000;
+    private int port = RPCConstants.DEFAULT_PORT;
+    /**
+     * 超时时间
+     */
+    private long timeout = 0;
+    /**
+     * 超时时间单位
+     */
+    private TimeUnit timeoutTimeUnit = TimeUnit.MILLISECONDS;
     /**
      * 注册中心配置
      */
@@ -25,6 +36,22 @@ public class SpringRPCProperties {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    public TimeUnit getTimeoutTimeUnit() {
+        return timeoutTimeUnit;
+    }
+
+    public void setTimeoutTimeUnit(TimeUnit timeoutTimeUnit) {
+        this.timeoutTimeUnit = timeoutTimeUnit;
     }
 
     public SpringRegistryProperties getRegistry() {

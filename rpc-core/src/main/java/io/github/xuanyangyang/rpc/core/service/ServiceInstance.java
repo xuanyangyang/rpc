@@ -1,7 +1,7 @@
 package io.github.xuanyangyang.rpc.core.service;
 
 import io.github.xuanyangyang.rpc.core.common.RPCException;
-import io.github.xuanyangyang.rpc.core.protocol.support.RpcInvocationInfo;
+import io.github.xuanyangyang.rpc.core.protocol.support.RPCInvocationInfo;
 
 /**
  * 服务实例
@@ -23,7 +23,7 @@ public interface ServiceInstance {
      * @param invocationInfo 调用信息
      * @return 调用结果
      */
-    Object invoke(RpcInvocationInfo invocationInfo) throws RPCException;
+    Object invoke(RPCInvocationInfo invocationInfo) throws RPCException;
 
     /**
      * @return 服务信息

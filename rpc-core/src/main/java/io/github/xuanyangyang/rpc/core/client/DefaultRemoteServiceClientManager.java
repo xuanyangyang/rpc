@@ -4,10 +4,9 @@ import io.github.xuanyangyang.rpc.core.net.Client;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 远程服务客户端管理
@@ -19,8 +18,9 @@ public class DefaultRemoteServiceClientManager implements RemoteServiceClientMan
     /**
      * serviceName -> serviceId -> serviceInstance
      */
-    private final Map<String, Map<String, RemoteServiceClient>> name2InstanceMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, RemoteServiceClient>> name2InstanceMap = new HashMap<>();
     private final ClientManager clientManager;
+    private final List<RemoteServiceClientListener> listeners = new CopyOnWriteArrayList<>();
 
     public DefaultRemoteServiceClientManager(ClientManager clientManager) {
         this.clientManager = clientManager;
@@ -37,6 +37,8 @@ public class DefaultRemoteServiceClientManager implements RemoteServiceClientMan
         remoteServiceClient = new DefaultRemoteServiceClient(serviceInfo, client);
         Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.computeIfAbsent(serviceInfo.getName(), key -> new ConcurrentHashMap<>());
         instanceMap.put(remoteServiceClient.getServiceInfo().getId(), remoteServiceClient);
+        Collection<RemoteServiceClient> clients = instanceMap.values();
+        listeners.forEach(listener -> listener.afterRemoteServiceClientsChange(serviceInfo.getName(), clients));
         return remoteServiceClient;
     }
 
@@ -52,9 +54,19 @@ public class DefaultRemoteServiceClientManager implements RemoteServiceClientMan
     }
 
     @Override
-    public RemoteServiceClient removeClient(String serviceName, String serviceId) {
+    public synchronized RemoteServiceClient removeClient(String serviceName, String serviceId) {
         Map<String, RemoteServiceClient> instanceMap = name2InstanceMap.getOrDefault(serviceName, Collections.emptyMap());
-        return instanceMap.remove(serviceId);
+        RemoteServiceClient removeClient = instanceMap.remove(serviceId);
+        if (removeClient != null) {
+            Collection<RemoteServiceClient> clients = getClients(serviceName);
+            listeners.forEach(listener -> listener.afterRemoteServiceClientsChange(serviceName, clients));
+        }
+        return removeClient;
+    }
+
+    @Override
+    public void addListener(RemoteServiceClientListener listener) {
+        listeners.add(listener);
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * netty channel
@@ -33,7 +34,12 @@ public class NettyChannel implements Channel {
 
     @Override
     public <T> CompletableFuture<T> send(ProtocolMessage message) {
-        DefaultFuture<T> futureResult = DefaultFuture.newFuture(message.getId());
+        return send(message, 0, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> send(ProtocolMessage message, long timeout, TimeUnit timeUnit) {
+        DefaultFuture<T> futureResult = DefaultFuture.newFuture(message.getId(), timeout, timeUnit);
         if (!isConnected()) {
             Response response = new Response(message.getId());
             response.setState(Response.STATE_CLIENT_ERROR);

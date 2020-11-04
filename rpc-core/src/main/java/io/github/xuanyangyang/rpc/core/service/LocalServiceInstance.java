@@ -1,7 +1,7 @@
 package io.github.xuanyangyang.rpc.core.service;
 
 import io.github.xuanyangyang.rpc.core.common.RPCException;
-import io.github.xuanyangyang.rpc.core.protocol.support.RpcInvocationInfo;
+import io.github.xuanyangyang.rpc.core.protocol.support.RPCInvocationInfo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,7 +29,7 @@ public class LocalServiceInstance implements ServiceInstance {
     }
 
     @Override
-    public Object invoke(RpcInvocationInfo invocationInfo) {
+    public Object invoke(RPCInvocationInfo invocationInfo) {
         try {
             Method method = service.getClass().getMethod(invocationInfo.getMethodName(), invocationInfo.getParameterTypes());
             return method.invoke(service, invocationInfo.getArgs());

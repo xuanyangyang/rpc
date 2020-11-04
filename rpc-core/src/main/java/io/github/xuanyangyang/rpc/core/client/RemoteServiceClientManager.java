@@ -1,5 +1,6 @@
 package io.github.xuanyangyang.rpc.core.client;
 
+import io.github.xuanyangyang.rpc.core.client.filter.RemoteServiceClientFilterChain;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 import java.util.Collection;
@@ -55,6 +56,13 @@ public interface RemoteServiceClientManager {
     RemoteServiceClient removeClient(String serviceName, String serviceId);
 
     /**
+     * 添加监听
+     *
+     * @param listener 监听器
+     */
+    void addListener(RemoteServiceClientListener listener);
+
+    /**
      * 初始化
      */
     void init();
@@ -63,4 +71,14 @@ public interface RemoteServiceClientManager {
      * 销毁
      */
     void destroy();
+
+    interface RemoteServiceClientListener {
+        /**
+         * 远程客户端集合发生变化之后
+         *
+         * @param serviceName 服务名
+         * @param clients     远程客户端集合
+         */
+        void afterRemoteServiceClientsChange(String serviceName, Collection<RemoteServiceClient> clients);
+    }
 }

@@ -3,6 +3,7 @@ package io.github.xuanyangyang.rpc.core.net;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 通讯通道
@@ -17,6 +18,15 @@ public interface Channel {
      * @param message 请求
      */
     <T> CompletableFuture<T> send(ProtocolMessage message);
+
+    /**
+     * 发送请求
+     *
+     * @param message  请求
+     * @param timeout  超时时间
+     * @param timeUnit 时间单位
+     */
+    <T> CompletableFuture<T> send(ProtocolMessage message, long timeout, TimeUnit timeUnit);
 
     /**
      * 关闭

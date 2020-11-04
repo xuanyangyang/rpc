@@ -22,7 +22,7 @@ public class Request implements ProtocolMessage {
     /**
      * rpc调用信息
      */
-    private RpcInvocationInfo invocationInfo;
+    private RPCInvocationInfo invocationInfo;
     /**
      * 协议ID
      */
@@ -45,11 +45,11 @@ public class Request implements ProtocolMessage {
         return id;
     }
 
-    public RpcInvocationInfo getInvocationInfo() {
+    public RPCInvocationInfo getInvocationInfo() {
         return invocationInfo;
     }
 
-    public void setInvocationInfo(RpcInvocationInfo invocationInfo) {
+    public void setInvocationInfo(RPCInvocationInfo invocationInfo) {
         this.invocationInfo = invocationInfo;
     }
 

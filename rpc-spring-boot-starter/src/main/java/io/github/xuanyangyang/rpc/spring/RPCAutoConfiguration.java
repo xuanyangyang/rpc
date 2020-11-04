@@ -2,6 +2,13 @@ package io.github.xuanyangyang.rpc.spring;
 
 import io.github.xuanyangyang.rpc.core.DefaultRPCContext;
 import io.github.xuanyangyang.rpc.core.RPCContext;
+import io.github.xuanyangyang.rpc.core.client.DefaultRemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.filter.BaseFilter;
+import io.github.xuanyangyang.rpc.core.client.filter.DefaultRemoteServiceClientFilterChainFactory;
+import io.github.xuanyangyang.rpc.core.client.filter.RemoteServiceClientFilterChainFactory;
+import io.github.xuanyangyang.rpc.core.client.loadbalancer.LoadBalancerFactory;
+import io.github.xuanyangyang.rpc.core.client.loadbalancer.RandomLoadBalancerFactory;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
@@ -23,9 +30,7 @@ import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisConfig;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
-import io.github.xuanyangyang.rpc.core.client.DefaultRemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
-import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.spring.common.SpringConstants;
 import io.github.xuanyangyang.rpc.spring.config.SpringRPCProperties;
@@ -97,14 +102,20 @@ public class RPCAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RPCProxyFactory.class)
-    public RPCProxyFactory rpcProxyFactory(RemoteServiceClientManager remoteServiceClientManager) {
-        return new DefaultRPCProxyFactory(remoteServiceClientManager);
+    @ConditionalOnMissingBean(RemoteServiceClientFilterChainFactory.class)
+    public RemoteServiceClientFilterChainFactory remoteServiceClientFilterChainFactory() {
+        return new DefaultRemoteServiceClientFilterChainFactory();
     }
 
     @Bean
-    public AnnotationRPCReferenceInfoProvider rpcReferenceInfoProvider(RPCReferenceManager rpcReferenceManager) {
-        return new AnnotationRPCReferenceInfoProvider(rpcReferenceManager);
+    @ConditionalOnMissingBean(RPCProxyFactory.class)
+    public RPCProxyFactory rpcProxyFactory(LoadBalancerFactory loadBalancerFactory, RemoteServiceClientManager remoteServiceClientManager, RemoteServiceClientFilterChainFactory filterChainFactory) {
+        return new DefaultRPCProxyFactory(loadBalancerFactory, remoteServiceClientManager, filterChainFactory);
+    }
+
+    @Bean
+    public AnnotationRPCReferenceInfoProvider rpcReferenceInfoProvider(RPCReferenceManager rpcReferenceManager, RPCConfig rpcConfig) {
+        return new AnnotationRPCReferenceInfoProvider(rpcReferenceManager, rpcConfig);
     }
 
     @Bean
@@ -121,8 +132,8 @@ public class RPCAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(RPCContext.class)
-    public RPCBoostrap rpcBoostrap(RPCContext rpcContext, CodecManager codecManager, ProtocolManager protocolManager) {
-        return new RPCBoostrap(rpcContext, codecManager, protocolManager);
+    public RPCBoostrap rpcBoostrap(RPCContext rpcContext, CodecManager codecManager, ProtocolManager protocolManager, RemoteServiceClientFilterChainFactory filterChainFactory) {
+        return new RPCBoostrap(rpcContext, codecManager, protocolManager, filterChainFactory);
     }
 
     @Bean
@@ -151,6 +162,8 @@ public class RPCAutoConfiguration {
     public RPCConfig rpcConfig(SpringRPCProperties rpcProperties) {
         RPCConfig rpcConfig = new RPCConfig();
         rpcConfig.setPort(rpcProperties.getPort());
+        rpcConfig.setTimeout(rpcProperties.getTimeout());
+        rpcConfig.setTimeoutTimeUnit(rpcProperties.getTimeoutTimeUnit());
         return rpcConfig;
     }
 
@@ -167,5 +180,16 @@ public class RPCAutoConfiguration {
     @ConditionalOnMissingBean(Registry.class)
     public Registry redisRegistry(RedisConfig redisConfig) {
         return new RedisRegistry(redisConfig);
+    }
+
+    @Bean
+    public BaseFilter baseFilter() {
+        return new BaseFilter();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LoadBalancerFactory.class)
+    public LoadBalancerFactory loadBalancerFactory() {
+        return new RandomLoadBalancerFactory();
     }
 }

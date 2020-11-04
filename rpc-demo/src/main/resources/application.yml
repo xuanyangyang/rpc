@@ -1,5 +1,16 @@
+# rpc配置
 rpc:
+  #  绑定端口
+  port: 10000
+  #  超时时间
+  timeout: 3
+  #  超时时间单位
+  timeoutTimeUnit: SECONDS
+  #  注册中心配置
   registry:
+    #    redis 配置
     redis:
+      #      是否启用
       enable: true
+      #      redis配置文件路径
       configPath: redis.yml

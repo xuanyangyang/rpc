@@ -19,4 +19,8 @@ public interface RPCConstants {
      * 默认codec ID
      */
     Short DEFAULT_CODEC_ID = 1;
+    /**
+     * 默认端口
+     */
+    int DEFAULT_PORT = 10000;
 }

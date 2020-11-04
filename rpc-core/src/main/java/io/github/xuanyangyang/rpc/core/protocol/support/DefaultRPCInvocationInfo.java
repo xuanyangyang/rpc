@@ -6,7 +6,7 @@ package io.github.xuanyangyang.rpc.core.protocol.support;
  * @author xuanyangyang
  * @since 2020/10/5 15:49
  */
-public class RpcInvocationInfo {
+public class DefaultRPCInvocationInfo implements RPCInvocationInfo {
     /**
      * 服务名
      */
@@ -28,6 +28,7 @@ public class RpcInvocationInfo {
      */
     private Class<?>[] parameterTypes;
 
+    @Override
     public String getServiceName() {
         return serviceName;
     }
@@ -36,6 +37,7 @@ public class RpcInvocationInfo {
         this.serviceName = serviceName;
     }
 
+    @Override
     public String getMethodName() {
         return methodName;
     }
@@ -44,6 +46,7 @@ public class RpcInvocationInfo {
         this.methodName = methodName;
     }
 
+    @Override
     public Object[] getArgs() {
         return args;
     }
@@ -52,6 +55,7 @@ public class RpcInvocationInfo {
         this.args = args;
     }
 
+    @Override
     public int getVersion() {
         return version;
     }
@@ -60,6 +64,7 @@ public class RpcInvocationInfo {
         this.version = version;
     }
 
+    @Override
     public Class<?>[] getParameterTypes() {
         return parameterTypes;
     }

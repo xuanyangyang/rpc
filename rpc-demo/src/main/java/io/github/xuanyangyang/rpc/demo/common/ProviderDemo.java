@@ -4,6 +4,10 @@ import io.github.xuanyangyang.rpc.core.DefaultRPCContext;
 import io.github.xuanyangyang.rpc.core.RPCContext;
 import io.github.xuanyangyang.rpc.core.client.DefaultRemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.filter.BaseFilter;
+import io.github.xuanyangyang.rpc.core.client.filter.DefaultRemoteServiceClientFilterChainFactory;
+import io.github.xuanyangyang.rpc.core.client.filter.RemoteServiceClientFilterChainFactory;
+import io.github.xuanyangyang.rpc.core.client.loadbalancer.RandomLoadBalancerFactory;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
@@ -54,8 +58,11 @@ public class ProviderDemo {
         ClientManager clientManager = new DefaultClientManager(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
         // 创建远程服务客户端管理
         RemoteServiceClientManager remoteServiceClientManager = new DefaultRemoteServiceClientManager(clientManager);
+        // 创建过滤工厂
+        RemoteServiceClientFilterChainFactory filterChainFactory = new DefaultRemoteServiceClientFilterChainFactory();
+        filterChainFactory.addFilter(new BaseFilter());
         // 创建rpc代理工厂
-        RPCProxyFactory rpcProxyFactory = new DefaultRPCProxyFactory(remoteServiceClientManager);
+        RPCProxyFactory rpcProxyFactory = new DefaultRPCProxyFactory(new RandomLoadBalancerFactory(), remoteServiceClientManager, filterChainFactory);
         // rpc引用管理
         RPCReferenceManager rpcReferenceManager = new DefaultRPCReferenceManager(rpcProxyFactory);
         // rpc配置

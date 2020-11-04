@@ -2,6 +2,12 @@ package io.github.xuanyangyang.rpc.demo.common;
 
 import io.github.xuanyangyang.rpc.core.DefaultRPCContext;
 import io.github.xuanyangyang.rpc.core.RPCContext;
+import io.github.xuanyangyang.rpc.core.client.DefaultRemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
+import io.github.xuanyangyang.rpc.core.client.filter.BaseFilter;
+import io.github.xuanyangyang.rpc.core.client.filter.DefaultRemoteServiceClientFilterChainFactory;
+import io.github.xuanyangyang.rpc.core.client.filter.RemoteServiceClientFilterChainFactory;
+import io.github.xuanyangyang.rpc.core.client.loadbalancer.RandomLoadBalancerFactory;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
@@ -19,9 +25,7 @@ import io.github.xuanyangyang.rpc.core.reference.*;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisConfig;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
-import io.github.xuanyangyang.rpc.core.client.DefaultRemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
-import io.github.xuanyangyang.rpc.core.client.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 
 /**
@@ -48,8 +52,11 @@ public class ConsumerDemo {
         ClientManager clientManager = new DefaultClientManager(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
         // 创建远程服务客户端管理
         RemoteServiceClientManager remoteServiceClientManager = new DefaultRemoteServiceClientManager(clientManager);
+        // 创建过滤工厂
+        RemoteServiceClientFilterChainFactory filterChainFactory = new DefaultRemoteServiceClientFilterChainFactory();
+        filterChainFactory.addFilter(new BaseFilter());
         // 创建rpc代理工厂
-        RPCProxyFactory rpcProxyFactory = new DefaultRPCProxyFactory(remoteServiceClientManager);
+        RPCProxyFactory rpcProxyFactory = new DefaultRPCProxyFactory(new RandomLoadBalancerFactory(), remoteServiceClientManager, filterChainFactory);
         // 构造一个rpc引用
         DefaultRPCReferenceInfo rpcReferenceInfo = new DefaultRPCReferenceInfo();
         rpcReferenceInfo.setClz(HiService.class);

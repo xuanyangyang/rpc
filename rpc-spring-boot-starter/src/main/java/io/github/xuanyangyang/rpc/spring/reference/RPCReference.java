@@ -1,6 +1,7 @@
 package io.github.xuanyangyang.rpc.spring.reference;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * rpc引用
@@ -26,4 +27,14 @@ public @interface RPCReference {
      * @return 版本
      */
     int version() default 0;
+
+    /**
+     * @return 超时时间
+     */
+    long timeout() default 0;
+
+    /**
+     * @return 超时时间单位
+     */
+    TimeUnit timeoutTimeUnit() default TimeUnit.SECONDS;
 }

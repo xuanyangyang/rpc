@@ -1,5 +1,7 @@
 package io.github.xuanyangyang.rpc.core.reference;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * rpc引用信息
  *
@@ -23,6 +25,14 @@ public class DefaultRPCReferenceInfo implements RPCReferenceInfo {
      * 引用的接口class
      */
     private Class<?> clz;
+    /**
+     * 超时时间
+     */
+    private long timeout;
+    /**
+     * 超时时间单位
+     */
+    private TimeUnit timeoutTimeUnit;
 
     @Override
     public String getName() {
@@ -56,7 +66,25 @@ public class DefaultRPCReferenceInfo implements RPCReferenceInfo {
         return clz;
     }
 
+    @Override
+    public long getTimeout() {
+        return timeout;
+    }
+
+    @Override
+    public TimeUnit getTimeoutTimeUnit() {
+        return timeoutTimeUnit;
+    }
+
     public void setClz(Class<?> clz) {
         this.clz = clz;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    public void setTimeoutTimeUnit(TimeUnit timeoutTimeUnit) {
+        this.timeoutTimeUnit = timeoutTimeUnit;
     }
 }

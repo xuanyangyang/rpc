@@ -1,6 +1,8 @@
 package io.github.xuanyangyang.rpc.spring;
 
 import io.github.xuanyangyang.rpc.core.RPCContext;
+import io.github.xuanyangyang.rpc.core.client.filter.RemoteServiceClientFilter;
+import io.github.xuanyangyang.rpc.core.client.filter.RemoteServiceClientFilterChainFactory;
 import io.github.xuanyangyang.rpc.core.codec.Codec;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.protocol.Protocol;
@@ -22,11 +24,13 @@ public class RPCBoostrap implements DisposableBean {
     private final RPCContext rpcContext;
     private final CodecManager codecManager;
     private final ProtocolManager protocolManager;
+    private final RemoteServiceClientFilterChainFactory filterChainFactory;
 
-    public RPCBoostrap(RPCContext rpcContext, CodecManager codecManager, ProtocolManager protocolManager) {
+    public RPCBoostrap(RPCContext rpcContext, CodecManager codecManager, ProtocolManager protocolManager, RemoteServiceClientFilterChainFactory filterChainFactory) {
         this.rpcContext = rpcContext;
         this.codecManager = codecManager;
         this.protocolManager = protocolManager;
+        this.filterChainFactory = filterChainFactory;
     }
 
     @EventListener
@@ -34,7 +38,13 @@ public class RPCBoostrap implements DisposableBean {
         ConfigurableApplicationContext applicationContext = event.getApplicationContext();
         registryCodec(applicationContext);
         registryProtocol(applicationContext);
+        registryFilter(applicationContext);
         rpcContext.start();
+    }
+
+    private void registryFilter(ConfigurableApplicationContext context) {
+        Map<String, RemoteServiceClientFilter> filterMap = context.getBeansOfType(RemoteServiceClientFilter.class);
+        filterChainFactory.addFilters(filterMap.values());
     }
 
     private void registryCodec(ConfigurableApplicationContext context) {

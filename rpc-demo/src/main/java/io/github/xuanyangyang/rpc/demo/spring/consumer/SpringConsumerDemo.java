@@ -15,7 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @SpringBootApplication
 public class SpringConsumerDemo {
-    @RPCReference
+    @RPCReference(timeout = 3)
     private HelloService helloService;
 
     @RPCReference
@@ -24,13 +24,16 @@ public class SpringConsumerDemo {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(SpringConsumerDemo.class, args);
         SpringConsumerDemo springConsumerDemo = context.getBean(SpringConsumerDemo.class);
-        String result = springConsumerDemo.helloService.hello("xyy");
-        System.out.println(result);
-
+        // 负载均衡检查
+        for (int i = 0; i < 10; i++) {
+            // 应该有不同的ip:port
+            String result = springConsumerDemo.helloService.hello("xyy");
+            System.out.println(result);
+        }
         springConsumerDemo.calcService.multiply(6, 7).thenAccept(res -> System.out.println("6 * 7 = " + res));
-
         System.out.println(springConsumerDemo.calcService.add(5, 7));
-
         System.out.println(springConsumerDemo.calcService.minus(10, 7));
+        String delayHello = springConsumerDemo.helloService.delayHello("xyy", 10 * 1000);
+        System.out.println(delayHello);
     }
 }

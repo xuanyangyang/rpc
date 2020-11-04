@@ -1,6 +1,7 @@
 package io.github.xuanyangyang.rpc.spring.reference;
 
 import io.github.xuanyangyang.rpc.core.common.RPCException;
+import io.github.xuanyangyang.rpc.core.config.RPCConfig;
 import io.github.xuanyangyang.rpc.core.reference.DefaultRPCReferenceInfo;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import org.springframework.beans.BeansException;
@@ -16,9 +17,11 @@ import org.springframework.util.ReflectionUtils;
  */
 public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBeanPostProcessor {
     private final RPCReferenceManager referenceManager;
+    private final RPCConfig rpcConfig;
 
-    public AnnotationRPCReferenceInfoProvider(RPCReferenceManager referenceManager) {
+    public AnnotationRPCReferenceInfoProvider(RPCReferenceManager referenceManager, RPCConfig rpcConfig) {
         this.referenceManager = referenceManager;
+        this.rpcConfig = rpcConfig;
     }
 
     @Override
@@ -43,6 +46,13 @@ public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBea
                     rpcReferenceInfo.setName(rpcReference.serviceName());
                 }
                 rpcReferenceInfo.setVersion(rpcReference.version());
+                if (rpcReference.timeout() == 0) {
+                    rpcReferenceInfo.setTimeout(rpcConfig.getTimeout());
+                    rpcReferenceInfo.setTimeoutTimeUnit(rpcConfig.getTimeoutTimeUnit());
+                } else {
+                    rpcReferenceInfo.setTimeout(rpcReference.timeout());
+                    rpcReferenceInfo.setTimeoutTimeUnit(rpcReference.timeoutTimeUnit());
+                }
                 referenceManager.addInfo(rpcReferenceInfo);
                 Object proxy = referenceManager.getOrCreateReference(rpcReferenceInfo.getName());
                 field.setAccessible(true);

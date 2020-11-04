@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * netty客户端
@@ -42,6 +43,11 @@ public class NettyClient implements Client {
     @Override
     public <T> CompletableFuture<T> send(ProtocolMessage message) {
         return channel.send(message);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> send(ProtocolMessage message, long timeout, TimeUnit timeUnit) {
+        return channel.send(message, timeout, timeUnit);
     }
 
     @Override

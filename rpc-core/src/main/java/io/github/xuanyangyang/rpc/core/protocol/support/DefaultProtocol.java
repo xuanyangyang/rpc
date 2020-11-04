@@ -110,7 +110,7 @@ public class DefaultProtocol implements Protocol {
 
     private Request decodeRequest(ByteBuf buffer, Header header) throws Exception {
         Request request = new Request(header.getMsgId());
-        RpcInvocationInfo invocationInfo = (RpcInvocationInfo) decodeObj(buffer, header.getCodecId());
+        RPCInvocationInfo invocationInfo = (RPCInvocationInfo) decodeObj(buffer, header.getCodecId());
         request.setInvocationInfo(invocationInfo);
         return request;
     }
