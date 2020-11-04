@@ -6,7 +6,7 @@ import io.github.xuanyangyang.rpc.core.service.LocalServiceInstance;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstance;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
-import io.github.xuanyangyang.rpc.spring.config.RPCConfig;
+import io.github.xuanyangyang.rpc.spring.config.SpringRPCProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -21,10 +21,10 @@ import java.util.Arrays;
  * @since 2020/11/2 00:06
  */
 public class RPCServiceBeanPostProcessor implements BeanPostProcessor {
-    private final RPCConfig rpcConfig;
+    private final SpringRPCProperties rpcConfig;
     private final ServiceInstanceManager serviceInstanceManager;
 
-    public RPCServiceBeanPostProcessor(RPCConfig rpcConfig, ServiceInstanceManager serviceInstanceManager) {
+    public RPCServiceBeanPostProcessor(SpringRPCProperties rpcConfig, ServiceInstanceManager serviceInstanceManager) {
         this.serviceInstanceManager = serviceInstanceManager;
         this.rpcConfig = rpcConfig;
     }

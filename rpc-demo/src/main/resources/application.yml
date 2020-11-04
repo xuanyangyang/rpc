@@ -1,0 +1,5 @@
+rpc:
+  registry:
+    redis:
+      enable: true
+      configPath: redis.yml

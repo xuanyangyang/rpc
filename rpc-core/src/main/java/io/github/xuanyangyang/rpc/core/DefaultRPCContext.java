@@ -1,5 +1,6 @@
 package io.github.xuanyangyang.rpc.core;
 
+import io.github.xuanyangyang.rpc.core.config.RPCConfig;
 import io.github.xuanyangyang.rpc.core.net.Server;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceInfo;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
@@ -40,17 +41,22 @@ public class DefaultRPCContext implements RPCContext {
      */
     private final RPCReferenceManager referenceManager;
     /**
+     * 配置
+     */
+    private final RPCConfig config;
+    /**
      * 运行中
      */
     private final AtomicBoolean running = new AtomicBoolean();
 
     public DefaultRPCContext(Server server, Registry registry, ServiceInstanceManager serviceInstanceManager,
-                             RemoteServiceClientManager remoteServiceClientManager, RPCReferenceManager referenceManager) {
+                             RemoteServiceClientManager remoteServiceClientManager, RPCReferenceManager referenceManager, RPCConfig config) {
         this.server = server;
         this.registry = registry;
         this.serviceInstanceManager = serviceInstanceManager;
         this.remoteServiceClientManager = remoteServiceClientManager;
         this.referenceManager = referenceManager;
+        this.config = config;
     }
 
     private void start0() {
@@ -72,7 +78,7 @@ public class DefaultRPCContext implements RPCContext {
     }
 
     private void startRPCServer() {
-        server.bind(10000);
+        server.bind(config.getPort());
     }
 
     private void monitorServiceInfoChange() {

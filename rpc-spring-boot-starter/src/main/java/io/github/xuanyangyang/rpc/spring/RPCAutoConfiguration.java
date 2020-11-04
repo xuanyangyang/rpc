@@ -6,6 +6,7 @@ import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
 import io.github.xuanyangyang.rpc.core.common.RPCConstants;
+import io.github.xuanyangyang.rpc.core.config.RPCConfig;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.Server;
@@ -20,18 +21,21 @@ import io.github.xuanyangyang.rpc.core.reference.DefaultRPCReferenceManager;
 import io.github.xuanyangyang.rpc.core.reference.RPCProxyFactory;
 import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
+import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisConfig;
+import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
 import io.github.xuanyangyang.rpc.core.service.DefaultRemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
 import io.github.xuanyangyang.rpc.core.service.RemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.spring.common.SpringConstants;
-import io.github.xuanyangyang.rpc.spring.config.RPCConfig;
+import io.github.xuanyangyang.rpc.spring.config.SpringRPCProperties;
 import io.github.xuanyangyang.rpc.spring.reference.AnnotationRPCReferenceInfoProvider;
 import io.github.xuanyangyang.rpc.spring.service.RPCServiceBeanPostProcessor;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -44,7 +48,7 @@ import java.util.concurrent.Executors;
  * @author xuanyangyang
  * @since 2020/11/1 22:33
  */
-@EnableConfigurationProperties(RPCConfig.class)
+@EnableConfigurationProperties(SpringRPCProperties.class)
 public class RPCAutoConfiguration {
 
     @Bean
@@ -106,12 +110,12 @@ public class RPCAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(RPCContext.class)
     public RPCContext rpcContext(Server server, Registry registry, ServiceInstanceManager serviceInstanceManager, RemoteServiceClientManager remoteServiceClientManager,
-                                 RPCReferenceManager referenceInfoManager) {
-        return new DefaultRPCContext(server, registry, serviceInstanceManager, remoteServiceClientManager, referenceInfoManager);
+                                 RPCReferenceManager referenceInfoManager, RPCConfig config) {
+        return new DefaultRPCContext(server, registry, serviceInstanceManager, remoteServiceClientManager, referenceInfoManager, config);
     }
 
     @Bean
-    public RPCServiceBeanPostProcessor rpcServiceBeanPostProcessor(RPCConfig rpcConfig, ServiceInstanceManager serviceInstanceManager) {
+    public RPCServiceBeanPostProcessor rpcServiceBeanPostProcessor(SpringRPCProperties rpcConfig, ServiceInstanceManager serviceInstanceManager) {
         return new RPCServiceBeanPostProcessor(rpcConfig, serviceInstanceManager);
     }
 
@@ -141,5 +145,27 @@ public class RPCAutoConfiguration {
     @ConditionalOnMissingBean(RPCReferenceManager.class)
     public RPCReferenceManager referenceManager(RPCProxyFactory rpcProxyFactory) {
         return new DefaultRPCReferenceManager(rpcProxyFactory);
+    }
+
+    @Bean
+    public RPCConfig rpcConfig(SpringRPCProperties rpcProperties) {
+        RPCConfig rpcConfig = new RPCConfig();
+        rpcConfig.setPort(rpcProperties.getPort());
+        return rpcConfig;
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "rpc.registry.redis", name = "enable")
+    public RedisConfig redisConfig(SpringRPCProperties rpcProperties) {
+        RedisConfig redisConfig = new RedisConfig();
+        redisConfig.setConfigPath(rpcProperties.getRegistry().getRedis().getConfigPath());
+        return redisConfig;
+    }
+
+    @Bean
+    @ConditionalOnBean(RedisConfig.class)
+    @ConditionalOnMissingBean(Registry.class)
+    public Registry redisRegistry(RedisConfig redisConfig) {
+        return new RedisRegistry(redisConfig);
     }
 }

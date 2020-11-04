@@ -1,6 +1,7 @@
 package io.github.xuanyangyang.rpc.core.registry.support.redis;
 
 import io.github.xuanyangyang.rpc.core.common.RPCConstants;
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.ServiceInfoListener;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
@@ -13,6 +14,8 @@ import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.codec.TypedJsonJacksonCodec;
 import org.redisson.config.Config;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +31,11 @@ public class RedisRegistry implements Registry {
     private RTopic serverInfoTopic;
     private final List<ServiceInfoListener> listeners = new LinkedList<>();
     private final Codec serviceInfoCodec = new TypedJsonJacksonCodec(ServiceInfo.class, String.class, ServiceInfo.class);
+    private final RedisConfig redisConfig;
+
+    public RedisRegistry(RedisConfig redisConfig) {
+        this.redisConfig = redisConfig;
+    }
 
     @Override
     public boolean addServiceInfo(ServiceInfo serviceInfo) {
@@ -66,9 +74,18 @@ public class RedisRegistry implements Registry {
 
     @Override
     public void init() {
-        Config config = new Config();
-        config.useSingleServer()
-                .setAddress("redis://127.0.0.1:6379");
+        Config config;
+        if (redisConfig.getConfigPath().isEmpty()) {
+            config = new Config();
+            config.useSingleServer().setAddress(redisConfig.getAddress());
+        } else {
+            try {
+                URL configUrl = RedisRegistry.class.getClassLoader().getResource(redisConfig.getConfigPath());
+                config = Config.fromYAML(configUrl);
+            } catch (IOException e) {
+                throw new RPCException("redis配置错误", e);
+            }
+        }
         redissonClient = Redisson.create(config);
         serverInfoTopic = redissonClient.getTopic("serverInfoTopic", new JsonJacksonCodec());
         serverInfoTopic.addListener(AfterAddServiceInfoEvent.class, (channel, msg) -> {
@@ -91,7 +108,7 @@ public class RedisRegistry implements Registry {
     }
 
     public static void main(String[] args) {
-        RedisRegistry redisRegistry = new RedisRegistry();
+        RedisRegistry redisRegistry = new RedisRegistry(new RedisConfig());
         redisRegistry.init();
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setId("test-1");

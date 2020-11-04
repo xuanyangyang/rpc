@@ -6,6 +6,7 @@ import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
 import io.github.xuanyangyang.rpc.core.common.RPCConstants;
+import io.github.xuanyangyang.rpc.core.config.RPCConfig;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.Server;
@@ -16,6 +17,7 @@ import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.support.DefaultProtocol;
 import io.github.xuanyangyang.rpc.core.reference.*;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
+import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisConfig;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
 import io.github.xuanyangyang.rpc.core.service.DefaultRemoteServiceClientManager;
 import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
@@ -31,7 +33,7 @@ import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 public class ConsumerDemo {
     public static void main(String[] args) {
         // 创建redis注册中心
-        Registry registry = new RedisRegistry();
+        Registry registry = new RedisRegistry(new RedisConfig());
         // 创建默认codec管理
         CodecManager codecManager = new DefaultCodecManager();
         // 添加默认codec
@@ -59,9 +61,11 @@ public class ConsumerDemo {
         referenceManager.addInfo(rpcReferenceInfo);
         // 创建服务端
         Server server = new NettyServer(protocolManager, new DefaultMessageDispatcher(serviceInstanceManager));
+        // rpc配置
+        RPCConfig config = new RPCConfig();
         // 构建rpc上下文
         RPCContext rpcContext = new DefaultRPCContext(server, registry, serviceInstanceManager,
-                remoteServiceClientManager, referenceManager);
+                remoteServiceClientManager, referenceManager, config);
         rpcContext.start();
         // 创建嗨服务代理
         HiService hiService = rpcProxyFactory.getOrCreateProxy(rpcReferenceInfo);
