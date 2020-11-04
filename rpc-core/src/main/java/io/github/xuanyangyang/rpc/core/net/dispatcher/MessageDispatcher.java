@@ -12,6 +12,7 @@ public interface MessageDispatcher {
     /**
      * 消息分发
      *
+     * @param channel 通道
      * @param message 消息
      */
     void dispatch(Channel channel, Object message);
