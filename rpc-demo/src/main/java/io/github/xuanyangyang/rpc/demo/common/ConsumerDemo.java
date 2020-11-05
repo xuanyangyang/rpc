@@ -75,7 +75,7 @@ public class ConsumerDemo {
                 remoteServiceClientManager, referenceManager, config);
         rpcContext.start();
         // 创建嗨服务代理
-        HiService hiService = rpcProxyFactory.getOrCreateProxy(rpcReferenceInfo);
+        HiService hiService = referenceManager.getOrCreateReference(rpcReferenceInfo.getName());
         // 调用服务
         String res = hiService.sayHi();
         System.out.println("收到：" + res);
