@@ -1,20 +1,21 @@
-package io.github.xuanyangyang.rpc.core.net.dispatcher;
+package io.github.xuanyangyang.rpc.core.net.dispatcher.support;
 
-import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.future.DefaultFuture;
 import io.github.xuanyangyang.rpc.core.net.Channel;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.MessageDispatcher;
+import io.github.xuanyangyang.rpc.core.protocol.support.RPCInvocationInfo;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.Response;
-import io.github.xuanyangyang.rpc.core.protocol.support.RPCInvocationInfo;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstance;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
 
 /**
  * 消息分发器
@@ -34,10 +35,16 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
     /**
      * 日志
      */
-    private static final Logger logger = LoggerFactory.getLogger(DefaultMessageDispatcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMessageDispatcher.class);
+    /**
+     * 返回值处理
+     */
+    private List<ReturnValueHandler> returnValueHandlers;
 
     public DefaultMessageDispatcher(ServiceInstanceManager serviceInstanceManager) {
         this.serviceInstanceManager = serviceInstanceManager;
+        this.returnValueHandlers = new ArrayList<>();
+        this.returnValueHandlers.add(new DefaultReturnValueHandler());
     }
 
     @Override
@@ -55,38 +62,40 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
         } else if (message instanceof Response) {
             DefaultFuture.received((Response) message);
         } else {
-            logger.warn("消息" + message + "被丢弃");
+            LOGGER.warn("消息" + message + "被丢弃");
         }
     }
 
     private void dispatchRequest(Channel channel, Request request) {
-        Response response = new Response(request.getId());
         RPCInvocationInfo invocationInfo = request.getInvocationInfo();
         ServiceInstance instance = serviceInstanceManager.getInstance(invocationInfo.getServiceName());
         if (instance == null) {
+            Response response = new Response(request.getId());
             response.setState(Response.STATE_SERVER_ERROR);
             response.setErrMsg("找不到" + invocationInfo.getServiceName() + "服务");
+            channel.send(response);
             return;
         }
-        try {
-            Object result = instance.invoke(invocationInfo);
-            if (result instanceof CompletionStage) {
-                ((CompletionStage<?>) result).thenAccept(response::setData);
-            } else if (result instanceof Future) {
-                try {
-                    response.setData(((Future<?>) result).get());
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RPCException(invocationInfo.getServiceName() + "执行" + invocationInfo.getMethodName() + "方法异常", e);
-                }
-            } else {
-                response.setData(result);
-            }
-        } catch (RPCException e) {
-            response.setState(Response.STATE_SERVER_ERROR);
-            response.setErrMsg(e.getMessage());
+        Object returnValue = instance.invoke(invocationInfo);
+        if (returnValue == null) {
+            Response response = new Response(request.getId());
+            response.setState(Response.STATE_OK);
+            channel.send(response);
         }
-        // todo 异常处理
-        channel.send(response);
+        try {
+            for (ReturnValueHandler handler : returnValueHandlers) {
+                if (handler.supports(returnValue)) {
+                    handler.handleReturnValue(channel, returnValue, () -> new Response(request.getId()));
+                    return;
+                }
+            }
+        } catch (Throwable throwable) {
+            Response response = new Response(request.getId());
+            response.setState(Response.STATE_SERVER_ERROR);
+            response.setErrMsg(throwable.getMessage());
+            channel.send(response);
+            LOGGER.error("处理返回值异常", throwable);
+        }
     }
 
     public Executor getExecutor() {
@@ -95,5 +104,13 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
 
     public void setExecutor(Executor executor) {
         this.executor = executor;
+    }
+
+    public void addReturnValueHandlers(Collection<ReturnValueHandler> returnValueHandlers) {
+        List<ReturnValueHandler> newReturnValueHandler = new ArrayList<>(this.returnValueHandlers.size() + returnValueHandlers.size());
+        newReturnValueHandler.addAll(this.returnValueHandlers);
+        newReturnValueHandler.addAll(returnValueHandlers);
+        newReturnValueHandler.sort(Comparator.comparingInt(ReturnValueHandler::getOrder));
+        this.returnValueHandlers = newReturnValueHandler;
     }
 }

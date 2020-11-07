@@ -17,7 +17,7 @@ import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.NetUtils;
 import io.github.xuanyangyang.rpc.core.net.Server;
-import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.support.DefaultMessageDispatcher;
 import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;

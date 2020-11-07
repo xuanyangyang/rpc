@@ -7,21 +7,22 @@ import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * 注解引用提供
+ * 引用扫描，处理{@link RPCReference}
  *
  * @author xuanyangyang
  * @since 2020/11/1 22:43
  */
-public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBeanPostProcessor {
-    private final RPCReferenceManager referenceManager;
-    private final RPCConfig rpcConfig;
+public class RPCReferenceBeanProcessor implements InstantiationAwareBeanPostProcessor, ApplicationContextAware {
+    private RPCReferenceManager referenceManager;
+    private RPCConfig rpcConfig;
+    private ApplicationContext applicationContext;
 
-    public AnnotationRPCReferenceInfoProvider(RPCReferenceManager referenceManager, RPCConfig rpcConfig) {
-        this.referenceManager = referenceManager;
-        this.rpcConfig = rpcConfig;
+    public RPCReferenceBeanProcessor() {
     }
 
     @Override
@@ -47,12 +48,14 @@ public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBea
                 }
                 rpcReferenceInfo.setVersion(rpcReference.version());
                 if (rpcReference.timeout() == 0) {
+                    RPCConfig rpcConfig = getRpcConfig();
                     rpcReferenceInfo.setTimeout(rpcConfig.getTimeout());
                     rpcReferenceInfo.setTimeoutTimeUnit(rpcConfig.getTimeoutTimeUnit());
                 } else {
                     rpcReferenceInfo.setTimeout(rpcReference.timeout());
                     rpcReferenceInfo.setTimeoutTimeUnit(rpcReference.timeoutTimeUnit());
                 }
+                RPCReferenceManager referenceManager = getReferenceManager();
                 referenceManager.addInfo(rpcReferenceInfo);
                 Object proxy = referenceManager.getOrCreateReference(rpcReferenceInfo.getName());
                 field.setAccessible(true);
@@ -61,5 +64,24 @@ public class AnnotationRPCReferenceInfoProvider implements InstantiationAwareBea
             targetClass = targetClass.getSuperclass();
         } while (targetClass != null && targetClass != Object.class);
         return pvs;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    public RPCReferenceManager getReferenceManager() {
+        if (referenceManager == null) {
+            referenceManager = applicationContext.getBean(RPCReferenceManager.class);
+        }
+        return referenceManager;
+    }
+
+    public RPCConfig getRpcConfig() {
+        if (rpcConfig == null) {
+            rpcConfig = applicationContext.getBean(RPCConfig.class);
+        }
+        return rpcConfig;
     }
 }

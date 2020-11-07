@@ -18,8 +18,11 @@ import io.github.xuanyangyang.rpc.core.config.RPCConfig;
 import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.Server;
-import io.github.xuanyangyang.rpc.core.net.dispatcher.DefaultMessageDispatcher;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.MessageDispatcher;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.support.CompletionStageReturnValueHandler;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.support.DefaultMessageDispatcher;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.support.FutureReturnValueHandler;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.support.ReturnValueHandler;
 import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolManager;
@@ -37,7 +40,7 @@ import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.spring.common.SpringConstants;
 import io.github.xuanyangyang.rpc.spring.config.SpringRPCProperties;
-import io.github.xuanyangyang.rpc.spring.reference.AnnotationRPCReferenceInfoProvider;
+import io.github.xuanyangyang.rpc.spring.reference.RPCReferenceBeanProcessor;
 import io.github.xuanyangyang.rpc.spring.service.RPCServiceBeanPostProcessor;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,8 +48,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -57,8 +63,8 @@ import java.util.concurrent.Executors;
  * @since 2020/11/1 22:33
  */
 @EnableConfigurationProperties(SpringRPCProperties.class)
+@Import({RPCReferenceBeanProcessor.class, RPCServiceBeanPostProcessor.class})
 public class RPCAutoConfiguration {
-
     @Bean
     @ConditionalOnMissingBean(ServiceInstanceManager.class)
     public ServiceInstanceManager serviceInstanceManager() {
@@ -67,9 +73,11 @@ public class RPCAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(MessageDispatcher.class)
-    public MessageDispatcher messageDispatcher(ServiceInstanceManager serviceInstanceManager, @Qualifier(SpringConstants.MESSAGE_EXECUTOR) Executor executor) {
+    public MessageDispatcher messageDispatcher(ServiceInstanceManager serviceInstanceManager, @Qualifier(SpringConstants.MESSAGE_EXECUTOR) Executor executor, ApplicationContext applicationContext) {
         DefaultMessageDispatcher messageDispatcher = new DefaultMessageDispatcher(serviceInstanceManager);
         messageDispatcher.setExecutor(executor);
+        Map<String, ReturnValueHandler> returnValueHandlerMap = applicationContext.getBeansOfType(ReturnValueHandler.class);
+        messageDispatcher.addReturnValueHandlers(returnValueHandlerMap.values());
         return messageDispatcher;
     }
 
@@ -117,20 +125,10 @@ public class RPCAutoConfiguration {
     }
 
     @Bean
-    public AnnotationRPCReferenceInfoProvider rpcReferenceInfoProvider(RPCReferenceManager rpcReferenceManager, RPCConfig rpcConfig) {
-        return new AnnotationRPCReferenceInfoProvider(rpcReferenceManager, rpcConfig);
-    }
-
-    @Bean
     @ConditionalOnMissingBean(RPCContext.class)
     public RPCContext rpcContext(Server server, Registry registry, ServiceInstanceManager serviceInstanceManager, RemoteServiceClientManager remoteServiceClientManager,
                                  RPCReferenceManager referenceInfoManager, RPCConfig config) {
         return new DefaultRPCContext(server, registry, serviceInstanceManager, remoteServiceClientManager, referenceInfoManager, config);
-    }
-
-    @Bean
-    public RPCServiceBeanPostProcessor rpcServiceBeanPostProcessor(SpringRPCProperties rpcConfig, ServiceInstanceManager serviceInstanceManager) {
-        return new RPCServiceBeanPostProcessor(rpcConfig, serviceInstanceManager);
     }
 
     @Bean
@@ -211,5 +209,15 @@ public class RPCAutoConfiguration {
     @ConditionalOnMissingBean(Registry.class)
     public Registry zookeeperRegistry(ZookeeperConfig zookeeperConfig, @Qualifier(SpringConstants.DEFAULT_CODEC) Codec codec) {
         return new ZookeeperRegistry(zookeeperConfig, codec);
+    }
+
+    @Bean
+    public CompletionStageReturnValueHandler completionStageReturnValueHandler() {
+        return new CompletionStageReturnValueHandler();
+    }
+
+    @Bean
+    public FutureReturnValueHandler futureReturnValueHandler() {
+        return new FutureReturnValueHandler();
     }
 }

@@ -1,32 +1,33 @@
 package io.github.xuanyangyang.rpc.spring.service;
 
 import io.github.xuanyangyang.rpc.core.common.RPCException;
+import io.github.xuanyangyang.rpc.core.config.RPCConfig;
 import io.github.xuanyangyang.rpc.core.net.NetUtils;
 import io.github.xuanyangyang.rpc.core.service.LocalServiceInstance;
 import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstance;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
-import io.github.xuanyangyang.rpc.spring.config.SpringRPCProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
 /**
- * rpc service 扫描
+ * rpc service 扫描，处理{@link RPCService}
  *
  * @author xuanyangyang
  * @since 2020/11/2 00:06
  */
-public class RPCServiceBeanPostProcessor implements BeanPostProcessor {
-    private final SpringRPCProperties rpcConfig;
-    private final ServiceInstanceManager serviceInstanceManager;
+public class RPCServiceBeanPostProcessor implements BeanPostProcessor, ApplicationContextAware {
+    private ServiceInstanceManager serviceInstanceManager;
+    private RPCConfig rpcConfig;
+    private ApplicationContext applicationContext;
 
-    public RPCServiceBeanPostProcessor(SpringRPCProperties rpcConfig, ServiceInstanceManager serviceInstanceManager) {
-        this.serviceInstanceManager = serviceInstanceManager;
-        this.rpcConfig = rpcConfig;
+    public RPCServiceBeanPostProcessor() {
     }
 
     @Override
@@ -41,6 +42,7 @@ public class RPCServiceBeanPostProcessor implements BeanPostProcessor {
             } catch (UnknownHostException e) {
                 throw new RPCException("无法获取本地IP");
             }
+            RPCConfig rpcConfig = getRpcConfig();
             if (rpcService.name().isEmpty()) {
                 Class<?>[] interfaces = beanClass.getInterfaces();
                 for (Class<?> interfaceClass : interfaces) {
@@ -67,6 +69,7 @@ public class RPCServiceBeanPostProcessor implements BeanPostProcessor {
     }
 
     private void registryService(ServiceInfo serviceInfo, Object obj) {
+        ServiceInstanceManager serviceInstanceManager = getServiceInstanceManager();
         ServiceInstance newServiceInstance = new LocalServiceInstance(serviceInfo, obj);
         ServiceInstance oldInstance = serviceInstanceManager.getInstance(newServiceInstance.getServiceName());
         if (oldInstance != null) {
@@ -75,5 +78,24 @@ public class RPCServiceBeanPostProcessor implements BeanPostProcessor {
                     + "，无法进行选择，请指定@RPCService的name属性");
         }
         serviceInstanceManager.addInstance(newServiceInstance);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    public ServiceInstanceManager getServiceInstanceManager() {
+        if (serviceInstanceManager == null) {
+            serviceInstanceManager = applicationContext.getBean(ServiceInstanceManager.class);
+        }
+        return serviceInstanceManager;
+    }
+
+    public RPCConfig getRpcConfig() {
+        if (rpcConfig == null) {
+            rpcConfig = applicationContext.getBean(RPCConfig.class);
+        }
+        return rpcConfig;
     }
 }
