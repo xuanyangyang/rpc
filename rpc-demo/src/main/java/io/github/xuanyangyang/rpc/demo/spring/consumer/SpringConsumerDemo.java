@@ -33,7 +33,7 @@ public class SpringConsumerDemo {
         springConsumerDemo.calcService.multiply(6, 7).thenAccept(res -> System.out.println("6 * 7 = " + res));
         System.out.println(springConsumerDemo.calcService.add(5, 7));
         System.out.println(springConsumerDemo.calcService.minus(10, 7));
-        String delayHello = springConsumerDemo.helloService.delayHello("xyy", 10 * 1000);
+        String delayHello = springConsumerDemo.helloService.delayHello("xyy", 1 * 1000);
         System.out.println(delayHello);
     }
 }

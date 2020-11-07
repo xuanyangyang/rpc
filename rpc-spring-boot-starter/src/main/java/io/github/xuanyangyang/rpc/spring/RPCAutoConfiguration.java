@@ -9,6 +9,7 @@ import io.github.xuanyangyang.rpc.core.client.filter.DefaultRemoteServiceClientF
 import io.github.xuanyangyang.rpc.core.client.filter.RemoteServiceClientFilterChainFactory;
 import io.github.xuanyangyang.rpc.core.client.loadbalancer.LoadBalancerFactory;
 import io.github.xuanyangyang.rpc.core.client.loadbalancer.RandomLoadBalancerFactory;
+import io.github.xuanyangyang.rpc.core.codec.Codec;
 import io.github.xuanyangyang.rpc.core.codec.CodecManager;
 import io.github.xuanyangyang.rpc.core.codec.DefaultCodecManager;
 import io.github.xuanyangyang.rpc.core.codec.ProtostuffCodec;
@@ -30,6 +31,8 @@ import io.github.xuanyangyang.rpc.core.reference.RPCReferenceManager;
 import io.github.xuanyangyang.rpc.core.registry.Registry;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisConfig;
 import io.github.xuanyangyang.rpc.core.registry.support.redis.RedisRegistry;
+import io.github.xuanyangyang.rpc.core.registry.support.zookeeper.ZookeeperConfig;
+import io.github.xuanyangyang.rpc.core.registry.support.zookeeper.ZookeeperRegistry;
 import io.github.xuanyangyang.rpc.core.service.DefaultServiceInstanceManager;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import io.github.xuanyangyang.rpc.spring.common.SpringConstants;
@@ -142,7 +145,7 @@ public class RPCAutoConfiguration {
         return new DefaultCodecManager();
     }
 
-    @Bean
+    @Bean(name = {SpringConstants.DEFAULT_CODEC, "protostuffCodec"})
     public ProtostuffCodec protostuffCodec() {
         return new ProtostuffCodec(RPCConstants.DEFAULT_CODEC_ID);
     }
@@ -191,5 +194,22 @@ public class RPCAutoConfiguration {
     @ConditionalOnMissingBean(LoadBalancerFactory.class)
     public LoadBalancerFactory loadBalancerFactory() {
         return new RandomLoadBalancerFactory();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "rpc.registry.zookeeper", name = "enable")
+    public ZookeeperConfig zookeeperConfig(SpringRPCProperties rpcProperties) {
+        SpringRPCProperties.SpringZookeeperProperties zookeeperProperties = rpcProperties.getRegistry().getZookeeper();
+        ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
+        zookeeperConfig.setAddress(zookeeperProperties.getAddress());
+        zookeeperConfig.setRootPath(zookeeperProperties.getRootPath());
+        return zookeeperConfig;
+    }
+
+    @Bean
+    @ConditionalOnBean(ZookeeperConfig.class)
+    @ConditionalOnMissingBean(Registry.class)
+    public Registry zookeeperRegistry(ZookeeperConfig zookeeperConfig, @Qualifier(SpringConstants.DEFAULT_CODEC) Codec codec) {
+        return new ZookeeperRegistry(zookeeperConfig, codec);
     }
 }

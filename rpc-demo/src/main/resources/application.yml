@@ -1,7 +1,7 @@
 # rpc配置
 rpc:
   #  绑定端口
-  port: 10000
+  port: 10001
   #  超时时间
   timeout: 3
   #  超时时间单位
@@ -11,6 +11,10 @@ rpc:
     #    redis 配置
     redis:
       #      是否启用
-      enable: true
+      enable: false
       #      redis配置文件路径
       configPath: redis.yml
+    #      zookeeper 配置
+    zookeeper:
+      #      是否启用
+      enable: true

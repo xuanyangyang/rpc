@@ -70,6 +70,10 @@ public class SpringRPCProperties {
          * redis配置
          */
         private SpringRedisProperties redis = new SpringRedisProperties();
+        /**
+         * zookeeper配置
+         */
+        private SpringZookeeperProperties zookeeper = new SpringZookeeperProperties();
 
         public SpringRedisProperties getRedis() {
             return redis;
@@ -77,6 +81,14 @@ public class SpringRPCProperties {
 
         public void setRedis(SpringRedisProperties redis) {
             this.redis = redis;
+        }
+
+        public SpringZookeeperProperties getZookeeper() {
+            return zookeeper;
+        }
+
+        public void setZookeeper(SpringZookeeperProperties zookeeper) {
+            this.zookeeper = zookeeper;
         }
     }
 
@@ -119,6 +131,48 @@ public class SpringRPCProperties {
 
         public void setConfigPath(String configPath) {
             this.configPath = configPath;
+        }
+    }
+
+    /**
+     * zookeeper配置
+     */
+    public static class SpringZookeeperProperties {
+        /**
+         * 是否启用
+         */
+        public boolean enable = false;
+        /**
+         * 地址
+         */
+        private String address = "localhost:2181";
+        /**
+         * 根目录
+         */
+        private String rootPath = "/service";
+
+        public boolean isEnable() {
+            return enable;
+        }
+
+        public void setEnable(boolean enable) {
+            this.enable = enable;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public String getRootPath() {
+            return rootPath;
+        }
+
+        public void setRootPath(String rootPath) {
+            this.rootPath = rootPath;
         }
     }
 }

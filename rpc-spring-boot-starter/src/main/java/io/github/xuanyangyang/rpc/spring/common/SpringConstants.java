@@ -11,4 +11,8 @@ public interface SpringConstants {
      * 消息执行器
      */
     String MESSAGE_EXECUTOR = "messageExecutor";
+    /**
+     * 默认codec
+     */
+    String DEFAULT_CODEC = "defaultCodec";
 }
