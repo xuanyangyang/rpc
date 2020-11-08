@@ -1,7 +1,13 @@
 # rpc
 本项目用于深入研究rpc原理，若是用于项目请优先选择已有的开源框架(`dubbo`,`grpc`)
 
-## 使用方法
+## 项目架构
+![项目架构](/images/rpc架构.png)
+
+## 详细文档
+[WIKI](https://github.com/xuanyangyang/rpc/wiki)
+
+## 快速开始
 
 ### SNAPSHOT版本问题
 由于目前版本是SNAPSHOT版本，所以需要在pom文件上启用SNAPSHOT
