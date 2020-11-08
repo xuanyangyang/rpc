@@ -9,23 +9,6 @@
 
 ## 快速开始
 
-### SNAPSHOT版本问题
-由于目前版本是SNAPSHOT版本，所以需要在pom文件上启用SNAPSHOT
-```
-<repositories>
-    <repository>
-        <id>oss.sonatype.org-snapshot</id>
-        <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-        <releases>
-            <enabled>false</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
-</repositories>
-```
-
 ### Spring Boot方式
 
 #### 添加依赖
@@ -33,7 +16,7 @@
 <dependency>
     <groupId>io.github.xuanyangyang</groupId>
     <artifactId>rpc-spring-boot-starter</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
