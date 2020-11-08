@@ -104,7 +104,11 @@ public class DefaultProtocol implements Protocol {
         response.setState(buffer.readByte());
         Codec codec = codecManager.getCodec(header.getCodecId());
         Object data = codec.decode(buffer);
-        response.setData(data);
+        if (response.getState() == Response.STATE_OK) {
+            response.setData(data);
+        } else {
+            response.setErrMsg((String) data);
+        }
         return response;
     }
 
@@ -173,7 +177,11 @@ public class DefaultProtocol implements Protocol {
 
     private void encodeResponse(ByteBuf buffer, Response response) throws Exception {
         buffer.writeByte(response.getState());
-        encodeObj(buffer, response.getData());
+        if (response.getState() == Response.STATE_OK) {
+            encodeObj(buffer, response.getData());
+        } else {
+            encodeObj(buffer, response.getErrMsg());
+        }
     }
 
     public void encodeRequest(ByteBuf buffer, Request request) throws Exception {

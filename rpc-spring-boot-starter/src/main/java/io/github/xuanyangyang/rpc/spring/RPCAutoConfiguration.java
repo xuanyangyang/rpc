@@ -19,9 +19,8 @@ import io.github.xuanyangyang.rpc.core.net.ClientManager;
 import io.github.xuanyangyang.rpc.core.net.DefaultClientManager;
 import io.github.xuanyangyang.rpc.core.net.Server;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.MessageDispatcher;
-import io.github.xuanyangyang.rpc.core.net.dispatcher.support.CompletionStageReturnValueHandler;
+import io.github.xuanyangyang.rpc.core.net.dispatcher.support.AsyncReturnValueHandler;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.support.DefaultMessageDispatcher;
-import io.github.xuanyangyang.rpc.core.net.dispatcher.support.FutureReturnValueHandler;
 import io.github.xuanyangyang.rpc.core.net.dispatcher.support.ReturnValueHandler;
 import io.github.xuanyangyang.rpc.core.net.netty.NettyServer;
 import io.github.xuanyangyang.rpc.core.protocol.DefaultProtocolManager;
@@ -212,12 +211,7 @@ public class RPCAutoConfiguration {
     }
 
     @Bean
-    public CompletionStageReturnValueHandler completionStageReturnValueHandler() {
-        return new CompletionStageReturnValueHandler();
-    }
-
-    @Bean
-    public FutureReturnValueHandler futureReturnValueHandler() {
-        return new FutureReturnValueHandler();
+    public AsyncReturnValueHandler completionStageReturnValueHandler() {
+        return new AsyncReturnValueHandler();
     }
 }

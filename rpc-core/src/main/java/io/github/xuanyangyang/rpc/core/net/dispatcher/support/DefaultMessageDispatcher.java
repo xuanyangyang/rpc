@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * 消息分发器
@@ -69,8 +71,9 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
     private void dispatchRequest(Channel channel, Request request) {
         RPCInvocationInfo invocationInfo = request.getInvocationInfo();
         ServiceInstance instance = serviceInstanceManager.getInstance(invocationInfo.getServiceName());
+        Supplier<Response> responseSupplier = () -> new Response(request.getId());
         if (instance == null) {
-            Response response = new Response(request.getId());
+            Response response = responseSupplier.get();
             response.setState(Response.STATE_SERVER_ERROR);
             response.setErrMsg("找不到" + invocationInfo.getServiceName() + "服务");
             channel.send(response);
@@ -78,24 +81,37 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
         }
         Object returnValue = instance.invoke(invocationInfo);
         if (returnValue == null) {
-            Response response = new Response(request.getId());
+            Response response = responseSupplier.get();
             response.setState(Response.STATE_OK);
             channel.send(response);
         }
         try {
             for (ReturnValueHandler handler : returnValueHandlers) {
                 if (handler.supports(returnValue)) {
-                    handler.handleReturnValue(channel, returnValue, () -> new Response(request.getId()));
+                    handler.handleReturnValue(returnValue, responseSupplier)
+                            .exceptionally(throwable -> {
+                                Response response = responseSupplier.get();
+                                response.setState(Response.STATE_SERVER_ERROR);
+                                response.setErrMsg(throwable.getMessage());
+                                LOGGER.error("处理返回值异常", throwable);
+                                return response;
+                            }).thenAccept(message -> handleSendFuture(channel.send(message)));
                     return;
                 }
             }
+            // 不应该走到这里！！！
+            LOGGER.error("返回值{}被丢弃！！！", returnValue);
         } catch (Throwable throwable) {
-            Response response = new Response(request.getId());
+            Response response = responseSupplier.get();
             response.setState(Response.STATE_SERVER_ERROR);
             response.setErrMsg(throwable.getMessage());
-            channel.send(response);
+            handleSendFuture(channel.send(response));
             LOGGER.error("处理返回值异常", throwable);
         }
+    }
+
+    private void handleSendFuture(CompletionStage<Object> sendFuture) {
+        sendFuture.whenComplete((data, throwable) -> LOGGER.error("发送失败", throwable));
     }
 
     public Executor getExecutor() {

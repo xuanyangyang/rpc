@@ -1,8 +1,9 @@
 package io.github.xuanyangyang.rpc.core.net.dispatcher.support;
 
-import io.github.xuanyangyang.rpc.core.net.Channel;
 import io.github.xuanyangyang.rpc.core.protocol.support.Response;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Supplier;
 
 /**
@@ -18,11 +19,11 @@ public class DefaultReturnValueHandler implements ReturnValueHandler {
     }
 
     @Override
-    public void handleReturnValue(Channel channel, Object returnValue, Supplier<Response> responseSupplier) {
+    public CompletionStage<Response> handleReturnValue(Object returnValue, Supplier<Response> responseSupplier) {
         Response response = responseSupplier.get();
         response.setState(Response.STATE_OK);
         response.setData(returnValue);
-        channel.send(response);
+        return CompletableFuture.completedFuture(response);
     }
 
     @Override

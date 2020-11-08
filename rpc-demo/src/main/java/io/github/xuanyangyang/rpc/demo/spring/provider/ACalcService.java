@@ -1,5 +1,6 @@
 package io.github.xuanyangyang.rpc.demo.spring.provider;
 
+import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.demo.spring.CalcService;
 import io.github.xuanyangyang.rpc.spring.service.RPCService;
 
@@ -23,6 +24,14 @@ public class ACalcService implements CalcService {
 
     @Override
     public CompletableFuture<Integer> multiply(int a, int b) {
-        return CompletableFuture.supplyAsync(() -> a * b);
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            throw new RPCException("故意异常");
+//            return a * b;
+        });
     }
 }

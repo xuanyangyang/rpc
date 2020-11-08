@@ -1,8 +1,8 @@
 package io.github.xuanyangyang.rpc.core.net.dispatcher.support;
 
-import io.github.xuanyangyang.rpc.core.net.Channel;
 import io.github.xuanyangyang.rpc.core.protocol.support.Response;
 
+import java.util.concurrent.CompletionStage;
 import java.util.function.Supplier;
 
 /**
@@ -21,11 +21,11 @@ public interface ReturnValueHandler {
     /**
      * 处理返回值
      *
-     * @param responseSupplier 请求
-     * @param channel          通道
      * @param returnValue      返回值
+     * @param responseSupplier response提供者
+     * @return response 处理结果
      */
-    void handleReturnValue(Channel channel, Object returnValue, Supplier<Response> responseSupplier);
+    CompletionStage<Response> handleReturnValue(Object returnValue, Supplier<Response> responseSupplier);
 
     /**
      * 越小越优先
