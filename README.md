@@ -144,7 +144,7 @@ public class SpringConsumerDemo {
 <dependency>
     <groupId>io.github.xuanyangyang</groupId>
     <artifactId>rpc-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
