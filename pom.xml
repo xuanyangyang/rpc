@@ -8,7 +8,26 @@
     <artifactId>rpc-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
-
+    <name>rpc-parent</name>
+    <description>rpc-parent</description>
+    <url>https://github.com/xuanyangyang/rpc</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>xuanyangyang</name>
+            <email>lierabbit@qq.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git://github.com/xuanyangyang/rpc.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:xuanyangyang/rpc.git</developerConnection>
+        <url>https://github.com/xuanyangyang/rpc</url>
+    </scm>
     <modules>
         <module>rpc-core</module>
         <module>rpc-demo</module>
