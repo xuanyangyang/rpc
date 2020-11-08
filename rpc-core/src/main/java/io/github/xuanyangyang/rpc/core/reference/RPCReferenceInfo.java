@@ -13,11 +13,6 @@ public interface RPCReferenceInfo {
     String getName();
 
     /**
-     * @return 协议id
-     */
-    Short getProtocolId();
-
-    /**
      * @return 服务版本
      */
     int getVersion();

@@ -29,4 +29,9 @@ public @interface RPCService {
      * @return 协议ID
      */
     short protocolId() default 0;
+
+    /**
+     * @return 编解码器ID
+     */
+    short codecId() default 0;
 }

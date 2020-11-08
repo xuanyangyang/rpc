@@ -37,7 +37,7 @@
     <properties>
         <java.version>11</java.version>
         <netty.version>4.1.51.Final</netty.version>
-        <rpc.version>1.0-SNAPSHOT</rpc.version>
+        <rpc.version>1.0.0</rpc.version>
         <protostuff.version>1.7.2</protostuff.version>
         <redisson.version>3.13.6</redisson.version>
     </properties>

@@ -46,18 +46,18 @@ public class RPCServiceBeanPostProcessor implements BeanPostProcessor, Applicati
             if (rpcService.name().isEmpty()) {
                 Class<?>[] interfaces = beanClass.getInterfaces();
                 for (Class<?> interfaceClass : interfaces) {
-                    ServiceInfo serviceInfo = createServiceInfo(interfaceClass.getName(), ip, rpcConfig.getPort(), rpcService.protocolId(), rpcService.version());
+                    ServiceInfo serviceInfo = createServiceInfo(interfaceClass.getName(), ip, rpcConfig.getPort(), rpcService.protocolId(), rpcService.codecId(), rpcService.version());
                     registryService(serviceInfo, bean);
                 }
             } else {
-                ServiceInfo serviceInfo = createServiceInfo(rpcService.name(), ip, rpcConfig.getPort(), rpcService.protocolId(), rpcService.version());
+                ServiceInfo serviceInfo = createServiceInfo(rpcService.name(), ip, rpcConfig.getPort(), rpcService.protocolId(), rpcService.codecId(), rpcService.version());
                 registryService(serviceInfo, bean);
             }
         }
         return bean;
     }
 
-    private ServiceInfo createServiceInfo(String serviceName, String ip, int port, short protocolId, int version) {
+    private ServiceInfo createServiceInfo(String serviceName, String ip, int port, short protocolId, short codecId, int version) {
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(serviceName);
         serviceInfo.setIp(ip);
@@ -65,6 +65,7 @@ public class RPCServiceBeanPostProcessor implements BeanPostProcessor, Applicati
         serviceInfo.setProtocolId(protocolId);
         serviceInfo.setVersion(version);
         serviceInfo.setId(serviceInfo.getIp() + ":" + serviceInfo.getPort());
+        serviceInfo.setCodecId(codecId);
         return serviceInfo;
     }
 

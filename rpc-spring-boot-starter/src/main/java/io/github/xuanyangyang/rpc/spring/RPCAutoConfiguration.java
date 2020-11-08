@@ -183,8 +183,8 @@ public class RPCAutoConfiguration {
     }
 
     @Bean
-    public BaseFilter baseFilter() {
-        return new BaseFilter();
+    public BaseFilter baseFilter(ProtocolManager protocolManager, CodecManager codecManager) {
+        return new BaseFilter(protocolManager, codecManager);
     }
 
     @Bean

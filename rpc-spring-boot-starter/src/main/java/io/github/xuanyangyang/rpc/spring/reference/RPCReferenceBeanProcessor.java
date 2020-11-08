@@ -40,7 +40,6 @@ public class RPCReferenceBeanProcessor implements InstantiationAwareBeanPostProc
                 }
                 DefaultRPCReferenceInfo rpcReferenceInfo = new DefaultRPCReferenceInfo();
                 rpcReferenceInfo.setClz(fieldClass);
-                rpcReferenceInfo.setProtocolId(rpcReference.protocolId());
                 if (rpcReference.serviceName().isEmpty()) {
                     rpcReferenceInfo.setName(fieldClass.getName());
                 } else {

@@ -1,8 +1,9 @@
 package io.github.xuanyangyang.rpc.demo.spring.provider;
 
-import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.demo.spring.CalcService;
 import io.github.xuanyangyang.rpc.spring.service.RPCService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -12,6 +13,8 @@ import java.util.concurrent.CompletableFuture;
  */
 @RPCService
 public class ACalcService implements CalcService {
+    private final static Logger LOGGER = LoggerFactory.getLogger(ACalcService.class);
+
     @Override
     public int add(int a, int b) {
         return a + b;
@@ -28,10 +31,9 @@ public class ACalcService implements CalcService {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("睡眠被打断", e);
             }
-            throw new RPCException("故意异常");
-//            return a * b;
+            return a * b;
         });
     }
 }

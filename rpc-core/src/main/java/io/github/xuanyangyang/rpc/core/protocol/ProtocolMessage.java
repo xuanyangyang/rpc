@@ -16,4 +16,9 @@ public interface ProtocolMessage {
      * @return 协议ID
      */
     Short getProtocolId();
+
+    /**
+     * @return 编解码器ID
+     */
+    Short getCodecId();
 }

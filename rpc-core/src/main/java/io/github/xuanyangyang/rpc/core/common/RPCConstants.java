@@ -18,7 +18,7 @@ public interface RPCConstants {
     /**
      * 默认codec ID
      */
-    Short DEFAULT_CODEC_ID = 1;
+    Short DEFAULT_CODEC_ID = 0;
     /**
      * 默认端口
      */

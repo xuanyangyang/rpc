@@ -6,6 +6,7 @@ import io.github.xuanyangyang.rpc.core.client.loadbalancer.LoadBalancer;
 import io.github.xuanyangyang.rpc.core.common.RPCException;
 import io.github.xuanyangyang.rpc.core.protocol.support.DefaultRPCInvocationInfo;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -44,7 +45,6 @@ public class RPCProxyHandler implements InvocationHandler {
         }
 
         Request request = new Request();
-        request.setProtocolId(rpcReferenceInfo.getProtocolId());
 
         DefaultRPCInvocationInfo invocationInfo = new DefaultRPCInvocationInfo();
         invocationInfo.setMethodName(methodName);
@@ -52,13 +52,16 @@ public class RPCProxyHandler implements InvocationHandler {
         invocationInfo.setServiceName(rpcReferenceInfo.getName());
         invocationInfo.setVersion(rpcReferenceInfo.getVersion());
         invocationInfo.setParameterTypes(method.getParameterTypes());
-
         request.setInvocationInfo(invocationInfo);
+
         List<RemoteServiceClient> clients = remoteServiceClientFilterChain.filter(invocationInfo);
         if (clients.isEmpty()) {
             throw new RPCException("没有可用的" + rpcReferenceInfo.getName() + "服务");
         }
         RemoteServiceClient instance = loadBalancer.select(clients, invocationInfo);
+        ServiceInfo serviceInfo = instance.getServiceInfo();
+        request.setProtocolId(serviceInfo.getProtocolId());
+        request.setCodecId(serviceInfo.getCodecId());
         CompletableFuture<Object> future = instance.getClient().send(request, rpcReferenceInfo.getTimeout(), rpcReferenceInfo.getTimeoutTimeUnit());
         Class<?> returnType = method.getReturnType();
         if (Future.class.isAssignableFrom(returnType) || CompletionStage.class.isAssignableFrom(returnType)) {

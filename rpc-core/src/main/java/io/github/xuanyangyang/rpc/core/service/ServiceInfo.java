@@ -26,6 +26,10 @@ public class ServiceInfo {
      */
     private Short protocolId;
     /**
+     * 编解码器ID
+     */
+    private Short codecId;
+    /**
      * ip
      */
     private String ip;
@@ -80,6 +84,14 @@ public class ServiceInfo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Short getCodecId() {
+        return codecId;
+    }
+
+    public void setCodecId(Short codecId) {
+        this.codecId = codecId;
     }
 
     @Override

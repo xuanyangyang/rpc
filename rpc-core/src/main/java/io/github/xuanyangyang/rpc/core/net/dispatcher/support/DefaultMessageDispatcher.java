@@ -6,6 +6,7 @@ import io.github.xuanyangyang.rpc.core.net.dispatcher.MessageDispatcher;
 import io.github.xuanyangyang.rpc.core.protocol.support.RPCInvocationInfo;
 import io.github.xuanyangyang.rpc.core.protocol.support.Request;
 import io.github.xuanyangyang.rpc.core.protocol.support.Response;
+import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstance;
 import io.github.xuanyangyang.rpc.core.service.ServiceInstanceManager;
 import org.slf4j.Logger;
@@ -71,7 +72,13 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
     private void dispatchRequest(Channel channel, Request request) {
         RPCInvocationInfo invocationInfo = request.getInvocationInfo();
         ServiceInstance instance = serviceInstanceManager.getInstance(invocationInfo.getServiceName());
-        Supplier<Response> responseSupplier = () -> new Response(request.getId());
+        Supplier<Response> responseSupplier = () -> {
+            Response response = new Response(request.getId());
+            ServiceInfo serviceInfo = instance.getServiceInfo();
+            response.setCodecId(serviceInfo.getCodecId());
+            response.setProtocolId(serviceInfo.getProtocolId());
+            return response;
+        };
         if (instance == null) {
             Response response = responseSupplier.get();
             response.setState(Response.STATE_SERVER_ERROR);

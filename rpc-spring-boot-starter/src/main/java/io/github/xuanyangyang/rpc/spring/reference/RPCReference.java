@@ -19,11 +19,6 @@ public @interface RPCReference {
     String serviceName() default "";
 
     /**
-     * @return 协议ID
-     */
-    short protocolId() default 0;
-
-    /**
      * @return 版本
      */
     int version() default 0;

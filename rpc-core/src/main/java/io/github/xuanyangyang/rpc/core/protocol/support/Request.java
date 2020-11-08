@@ -1,5 +1,6 @@
 package io.github.xuanyangyang.rpc.core.protocol.support;
 
+import io.github.xuanyangyang.rpc.core.common.RPCConstants;
 import io.github.xuanyangyang.rpc.core.protocol.ProtocolMessage;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,7 +27,11 @@ public class Request implements ProtocolMessage {
     /**
      * 协议ID
      */
-    private short protocolId;
+    private Short protocolId = RPCConstants.DEFAULT_PROTOCOL_ID;
+    /**
+     * 编解码器ID
+     */
+    private Short codecId = RPCConstants.DEFAULT_CODEC_ID;
 
     public Request(Long id) {
         this.id = id;
@@ -58,7 +63,16 @@ public class Request implements ProtocolMessage {
         return protocolId;
     }
 
-    public void setProtocolId(short protocolId) {
+    @Override
+    public Short getCodecId() {
+        return codecId;
+    }
+
+    public void setProtocolId(Short protocolId) {
         this.protocolId = protocolId;
+    }
+
+    public void setCodecId(Short codecId) {
+        this.codecId = codecId;
     }
 }

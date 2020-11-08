@@ -14,10 +14,6 @@ public class DefaultRPCReferenceInfo implements RPCReferenceInfo {
      */
     private String name;
     /**
-     * 协议id
-     */
-    private Short protocolId;
-    /**
      * 服务版本
      */
     private int version;
@@ -41,15 +37,6 @@ public class DefaultRPCReferenceInfo implements RPCReferenceInfo {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public Short getProtocolId() {
-        return protocolId;
-    }
-
-    public void setProtocolId(Short protocolId) {
-        this.protocolId = protocolId;
     }
 
     @Override

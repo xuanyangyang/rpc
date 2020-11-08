@@ -10,7 +10,13 @@ import io.github.xuanyangyang.rpc.core.service.ServiceInfo;
  * @since 2020/11/4 20:34
  */
 public interface RemoteServiceClient {
-     ServiceInfo getServiceInfo();
+    /**
+     * @return 服务信息
+     */
+    ServiceInfo getServiceInfo();
 
-     Client getClient();
+    /**
+     * @return 客户端
+     */
+    Client getClient();
 }

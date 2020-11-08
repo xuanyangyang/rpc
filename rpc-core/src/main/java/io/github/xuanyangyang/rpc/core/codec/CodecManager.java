@@ -30,4 +30,10 @@ public interface CodecManager {
      * @return 被移除的codec
      */
     Codec removeCodec(Short id);
+
+    /**
+     * @param id codec id
+     * @return 是否有ID对应的codec
+     */
+    boolean hasCodec(Short id);
 }

@@ -42,10 +42,6 @@ public class DefaultProtocol implements Protocol {
      */
     private final CodecManager codecManager;
     /**
-     * 当前codecID
-     */
-    private Short codecId = RPCConstants.DEFAULT_CODEC_ID;
-    /**
      * 请求类型
      */
     private static final byte TYPE_REQUEST = 1;
@@ -102,6 +98,8 @@ public class DefaultProtocol implements Protocol {
     private Response decodeResponse(ByteBuf buffer, Header header) throws Exception {
         Response response = new Response(header.getMsgId());
         response.setState(buffer.readByte());
+        response.setProtocolId(getId());
+        response.setCodecId(header.getCodecId());
         Codec codec = codecManager.getCodec(header.getCodecId());
         Object data = codec.decode(buffer);
         if (response.getState() == Response.STATE_OK) {
@@ -114,12 +112,14 @@ public class DefaultProtocol implements Protocol {
 
     private Request decodeRequest(ByteBuf buffer, Header header) throws Exception {
         Request request = new Request(header.getMsgId());
+        request.setProtocolId(getId());
+        request.setCodecId(header.getCodecId());
         RPCInvocationInfo invocationInfo = (RPCInvocationInfo) decodeObj(buffer, header.getCodecId());
         request.setInvocationInfo(invocationInfo);
         return request;
     }
 
-    private void encodeHeader(ByteBuf buffer, long id, byte type) {
+    private void encodeHeader(ByteBuf buffer, long id, byte type, short codecId) {
         int headerWriterIndex = buffer.writerIndex();
         buffer.writerIndex(buffer.writerIndex() + HEADER_LENGTH);
         buffer.writeInt(protocolVersion);
@@ -161,12 +161,12 @@ public class DefaultProtocol implements Protocol {
         if (message instanceof Request) {
             Request request = (Request) message;
             request.setProtocolId(getId());
-            encodeHeader(buffer, request.getId(), TYPE_REQUEST);
+            encodeHeader(buffer, request.getId(), TYPE_REQUEST, request.getCodecId());
             encodeRequest(buffer, request);
         } else if (message instanceof Response) {
             Response response = (Response) message;
             response.setProtocolId(getId());
-            encodeHeader(buffer, response.getId(), TYPE_RESPONSE);
+            encodeHeader(buffer, response.getId(), TYPE_RESPONSE, response.getCodecId());
             encodeResponse(buffer, response);
         } else {
             throw new RPCException("目前不支持除了Request，Response之外的消息类型，收到的消息类型：" + message.getClass());
@@ -178,17 +178,17 @@ public class DefaultProtocol implements Protocol {
     private void encodeResponse(ByteBuf buffer, Response response) throws Exception {
         buffer.writeByte(response.getState());
         if (response.getState() == Response.STATE_OK) {
-            encodeObj(buffer, response.getData());
+            encodeObj(buffer, response.getData(), response.getCodecId());
         } else {
-            encodeObj(buffer, response.getErrMsg());
+            encodeObj(buffer, response.getErrMsg(), response.getCodecId());
         }
     }
 
     public void encodeRequest(ByteBuf buffer, Request request) throws Exception {
-        encodeObj(buffer, request.getInvocationInfo());
+        encodeObj(buffer, request.getInvocationInfo(), request.getCodecId());
     }
 
-    private void encodeObj(ByteBuf buffer, Object obj) throws Exception {
+    private void encodeObj(ByteBuf buffer, Object obj, Short codecId) throws Exception {
         Codec codec = codecManager.getCodec(codecId);
         if (codec == null) {
             throw new NoSuchCodecException(codecId);
