@@ -1,5 +1,6 @@
 package io.github.xuanyangyang.rpc.demo.spring.consumer;
 
+import io.github.xuanyangyang.rpc.demo.spring.AsyncService;
 import io.github.xuanyangyang.rpc.demo.spring.CalcService;
 import io.github.xuanyangyang.rpc.demo.spring.HelloService;
 import io.github.xuanyangyang.rpc.spring.reference.RPCReference;
@@ -23,6 +24,9 @@ public class SpringConsumerDemo {
     @RPCReference
     private CalcService calcService;
 
+    @RPCReference
+    private AsyncService asyncService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringConsumerDemo.class);
 
     public static void main(String[] args) {
@@ -45,5 +49,6 @@ public class SpringConsumerDemo {
         System.out.println(springConsumerDemo.calcService.minus(10, 7));
         String delayHello = springConsumerDemo.helloService.delayHello("xyy", 2 * 1000);
         System.out.println(delayHello);
+        springConsumerDemo.asyncService.hi("xyy").thenAccept(System.out::println);
     }
 }
