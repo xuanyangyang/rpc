@@ -4,6 +4,9 @@ rpc是一款通讯框架，支持异步通讯，动态扩容，负载均衡，�
 ## 项目架构
 ![项目架构](/images/rpc架构.png)
 
+## 消费流程
+![流程](https://github.com/xuanyangyang/rpc/blob/master/images/rpc流程.png)
+
 ## 详细文档
 [WIKI](https://github.com/xuanyangyang/rpc/wiki)
 
