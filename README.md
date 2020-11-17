@@ -187,7 +187,7 @@ ClientManager clientManager = new DefaultClientManager(protocolManager, new Defa
 RemoteServiceClientManager remoteServiceClientManager = new DefaultRemoteServiceClientManager(clientManager);
 // 创建过滤工厂
 RemoteServiceClientFilterChainFactory filterChainFactory = new DefaultRemoteServiceClientFilterChainFactory();
-filterChainFactory.addFilter(new BaseFilter());
+filterChainFactory.addFilter(new BaseFilter(protocolManager, codecManager));
 // 创建rpc代理工厂
 RPCProxyFactory rpcProxyFactory = new DefaultRPCProxyFactory(new RandomLoadBalancerFactory(), remoteServiceClientManager, filterChainFactory);
 // rpc引用管理
@@ -204,6 +204,7 @@ InetAddress localAddress = NetUtils.getLocalAddress();
 serviceInfo.setIp(localAddress.getHostAddress());
 serviceInfo.setPort(config.getPort());
 serviceInfo.setId(serviceInfo.getName() + ":" + serviceInfo.getIp() + ":" + serviceInfo.getPort());
+serviceInfo.setCodecId(RPCConstants.DEFAULT_CODEC_ID);
 // 创建本地服务实例
 ServiceInstance hiServiceInstance = new LocalServiceInstance(serviceInfo, new DefaultHiService());
 serviceInstanceManager.addInstance(hiServiceInstance);
@@ -236,14 +237,13 @@ ClientManager clientManager = new DefaultClientManager(protocolManager, new Defa
 RemoteServiceClientManager remoteServiceClientManager = new DefaultRemoteServiceClientManager(clientManager);
 // 创建过滤工厂
 RemoteServiceClientFilterChainFactory filterChainFactory = new DefaultRemoteServiceClientFilterChainFactory();
-filterChainFactory.addFilter(new BaseFilter());
+filterChainFactory.addFilter(new BaseFilter(protocolManager, codecManager));
 // 创建rpc代理工厂
 RPCProxyFactory rpcProxyFactory = new DefaultRPCProxyFactory(new RandomLoadBalancerFactory(), remoteServiceClientManager, filterChainFactory);
 // 构造一个rpc引用
 DefaultRPCReferenceInfo rpcReferenceInfo = new DefaultRPCReferenceInfo();
 rpcReferenceInfo.setClz(HiService.class);
 rpcReferenceInfo.setName(HiService.class.getName());
-rpcReferenceInfo.setProtocolId(RPCConstants.DEFAULT_PROTOCOL_ID);
 rpcReferenceInfo.setVersion(0);
 // 创建引用管理
 RPCReferenceManager referenceManager = new DefaultRPCReferenceManager(rpcProxyFactory);
