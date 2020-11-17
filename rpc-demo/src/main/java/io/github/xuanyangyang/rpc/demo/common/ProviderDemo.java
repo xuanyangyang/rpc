@@ -77,6 +77,7 @@ public class ProviderDemo {
         serviceInfo.setIp(localAddress.getHostAddress());
         serviceInfo.setPort(config.getPort());
         serviceInfo.setId(serviceInfo.getName() + ":" + serviceInfo.getIp() + ":" + serviceInfo.getPort());
+        serviceInfo.setCodecId(RPCConstants.DEFAULT_CODEC_ID);
         // 创建本地服务实例
         ServiceInstance hiServiceInstance = new LocalServiceInstance(serviceInfo, new DefaultHiService());
         serviceInstanceManager.addInstance(hiServiceInstance);
